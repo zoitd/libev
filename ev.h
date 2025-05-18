@@ -40,16 +40,18 @@
 #ifndef EV_H_
 #define EV_H_
 
+#define __cplusplus 202302L
+
 #ifdef __cplusplus
-# define EV_CPP(x) x
-# if __cplusplus >= 201103L
-#  define EV_THROW noexcept
-# else
-#  define EV_THROW throw ()
-# endif
+#define EV_CPP(x) x
+#if __cplusplus >= 201103L
+#define EV_THROW noexcept
 #else
-# define EV_CPP(x)
-# define EV_THROW
+#define EV_THROW throw()
+#endif
+#else
+#define EV_CPP(x)
+#define EV_THROW
 #endif
 
 EV_CPP(extern "C" {)
@@ -57,95 +59,96 @@ EV_CPP(extern "C" {)
 /*****************************************************************************/
 
 /* pre-4.0 compatibility */
-#ifndef EV_COMPAT3
-# define EV_COMPAT3 1
-#endif
+#define EV_COMPAT3 0
+    // #ifndef EV_COMPAT3
+    // #define EV_COMPAT3 1
+    // #endif
 
 #ifndef EV_FEATURES
-# if defined __OPTIMIZE_SIZE__
-#  define EV_FEATURES 0x7c
-# else
-#  define EV_FEATURES 0x7f
-# endif
+#if defined __OPTIMIZE_SIZE__
+#define EV_FEATURES 0x7c
+#else
+#define EV_FEATURES 0x7f
+#endif
 #endif
 
-#define EV_FEATURE_CODE     ((EV_FEATURES) &  1)
-#define EV_FEATURE_DATA     ((EV_FEATURES) &  2)
-#define EV_FEATURE_CONFIG   ((EV_FEATURES) &  4)
-#define EV_FEATURE_API      ((EV_FEATURES) &  8)
+#define EV_FEATURE_CODE ((EV_FEATURES) & 1)
+#define EV_FEATURE_DATA ((EV_FEATURES) & 2)
+#define EV_FEATURE_CONFIG ((EV_FEATURES) & 4)
+#define EV_FEATURE_API ((EV_FEATURES) & 8)
 #define EV_FEATURE_WATCHERS ((EV_FEATURES) & 16)
 #define EV_FEATURE_BACKENDS ((EV_FEATURES) & 32)
-#define EV_FEATURE_OS       ((EV_FEATURES) & 64)
+#define EV_FEATURE_OS ((EV_FEATURES) & 64)
 
 /* these priorities are inclusive, higher priorities will be invoked earlier */
 #ifndef EV_MINPRI
-# define EV_MINPRI (EV_FEATURE_CONFIG ? -2 : 0)
+#define EV_MINPRI (EV_FEATURE_CONFIG ? -2 : 0)
 #endif
 #ifndef EV_MAXPRI
-# define EV_MAXPRI (EV_FEATURE_CONFIG ? +2 : 0)
+#define EV_MAXPRI (EV_FEATURE_CONFIG ? +2 : 0)
 #endif
 
 #ifndef EV_MULTIPLICITY
-# define EV_MULTIPLICITY EV_FEATURE_CONFIG
+#define EV_MULTIPLICITY EV_FEATURE_CONFIG
 #endif
 
 #ifndef EV_PERIODIC_ENABLE
-# define EV_PERIODIC_ENABLE EV_FEATURE_WATCHERS
+#define EV_PERIODIC_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_STAT_ENABLE
-# define EV_STAT_ENABLE EV_FEATURE_WATCHERS
+#define EV_STAT_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_PREPARE_ENABLE
-# define EV_PREPARE_ENABLE EV_FEATURE_WATCHERS
+#define EV_PREPARE_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_CHECK_ENABLE
-# define EV_CHECK_ENABLE EV_FEATURE_WATCHERS
+#define EV_CHECK_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_IDLE_ENABLE
-# define EV_IDLE_ENABLE EV_FEATURE_WATCHERS
+#define EV_IDLE_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_FORK_ENABLE
-# define EV_FORK_ENABLE EV_FEATURE_WATCHERS
+#define EV_FORK_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_CLEANUP_ENABLE
-# define EV_CLEANUP_ENABLE EV_FEATURE_WATCHERS
+#define EV_CLEANUP_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_SIGNAL_ENABLE
-# define EV_SIGNAL_ENABLE EV_FEATURE_WATCHERS
+#define EV_SIGNAL_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_CHILD_ENABLE
-# ifdef _WIN32
-#  define EV_CHILD_ENABLE 0
-# else
-#  define EV_CHILD_ENABLE EV_FEATURE_WATCHERS
+#ifdef _WIN32
+#define EV_CHILD_ENABLE 0
+#else
+#define EV_CHILD_ENABLE EV_FEATURE_WATCHERS
 #endif
 #endif
 
 #ifndef EV_ASYNC_ENABLE
-# define EV_ASYNC_ENABLE EV_FEATURE_WATCHERS
+#define EV_ASYNC_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_EMBED_ENABLE
-# define EV_EMBED_ENABLE EV_FEATURE_WATCHERS
+#define EV_EMBED_ENABLE EV_FEATURE_WATCHERS
 #endif
 
 #ifndef EV_WALK_ENABLE
-# define EV_WALK_ENABLE 0 /* not yet */
+#define EV_WALK_ENABLE 0 /* not yet */
 #endif
 
-/*****************************************************************************/
+    /*****************************************************************************/
 
 #if EV_CHILD_ENABLE && !EV_SIGNAL_ENABLE
-# undef EV_SIGNAL_ENABLE
-# define EV_SIGNAL_ENABLE 1
+#undef EV_SIGNAL_ENABLE
+#define EV_SIGNAL_ENABLE 1
 #endif
 
 /*****************************************************************************/
@@ -155,700 +158,784 @@ typedef double ev_tstamp;
 #include <string.h> /* for memmove */
 
 #ifndef EV_ATOMIC_T
-# include <signal.h>
-# define EV_ATOMIC_T sig_atomic_t volatile
+#include <signal.h>
+#define EV_ATOMIC_T sig_atomic_t volatile  // 强制必须每次从内存取值
 #endif
 
 #if EV_STAT_ENABLE
-# ifdef _WIN32
-#  include <time.h>
-#  include <sys/types.h>
-# endif
-# include <sys/stat.h>
+#ifdef _WIN32
+#include <sys/types.h>
+#include <time.h>
+#endif
+#include <sys/stat.h>
 #endif
 
 /* support multiple event loops? */
 #if EV_MULTIPLICITY
-struct ev_loop;
-# define EV_P  struct ev_loop *loop               /* a loop as sole parameter in a declaration */
-# define EV_P_ EV_P,                              /* a loop as first of multiple parameters */
-# define EV_A  loop                               /* a loop as sole argument to a function call */
-# define EV_A_ EV_A,                              /* a loop as first of multiple arguments */
-# define EV_DEFAULT_UC  ev_default_loop_uc_ ()    /* the default loop, if initialised, as sole arg */
-# define EV_DEFAULT_UC_ EV_DEFAULT_UC,            /* the default loop as first of multiple arguments */
-# define EV_DEFAULT  ev_default_loop (0)          /* the default loop as sole arg */
-# define EV_DEFAULT_ EV_DEFAULT,                  /* the default loop as first of multiple arguments */
+    struct ev_loop;
+#define EV_P struct ev_loop *loop           /* a loop as sole parameter in a declaration */
+#define EV_P_ , EV_P,                       /* a loop as first of multiple parameters */
+#define EV_A loop                           /* a loop as sole argument to a function call */
+#define EV_A_ EV_A,                         /* a loop as first of multiple arguments */
+#define EV_DEFAULT_UC ev_default_loop_uc_() /* the default loop, if initialised, as sole arg */
+#define EV_DEFAULT_UC_ EV_DEFAULT_UC,       /* the default loop as first of multiple arguments */
+#define EV_DEFAULT ev_default_loop(0)       /* the default loop as sole arg */
+#define EV_DEFAULT_ EV_DEFAULT,             /* the default loop as first of multiple arguments */
 #else
-# define EV_P void
-# define EV_P_
-# define EV_A
-# define EV_A_
-# define EV_DEFAULT
-# define EV_DEFAULT_
-# define EV_DEFAULT_UC
-# define EV_DEFAULT_UC_
-# undef EV_EMBED_ENABLE
+#define EV_P void
+#define EV_P_ ,
+#define EV_A
+#define loop ,
+#define EV_DEFAULT
+#define EV_DEFAULT_
+#define EV_DEFAULT_UC
+#define EV_DEFAULT_UC_
+#undef EV_EMBED_ENABLE
 #endif
 
 /* EV_INLINE is used for functions in header files */
 #if __STDC_VERSION__ >= 199901L || __GNUC__ >= 3
-# define EV_INLINE static inline
+#define EV_INLINE static inline
 #else
-# define EV_INLINE static
+#define EV_INLINE static
 #endif
 
 #ifdef EV_API_STATIC
-# define EV_API_DECL static
+#define EV_API_DECL static
 #else
-# define EV_API_DECL extern
+#define EV_API_DECL extern
 #endif
 
 /* EV_PROTOTYPES can be used to switch of prototype declarations */
 #ifndef EV_PROTOTYPES
-# define EV_PROTOTYPES 1
+#define EV_PROTOTYPES 1
 #endif
 
-/*****************************************************************************/
+    /*****************************************************************************/
 
 #define EV_VERSION_MAJOR 4
 #define EV_VERSION_MINOR 22
 
-/* eventmask, revents, events... */
+/* 事件掩码，返回事件，事件类型... */
 enum {
-  EV_UNDEF    = (int)0xFFFFFFFF, /* guaranteed to be invalid */
-  EV_NONE     =            0x00, /* no events */
-  EV_READ     =            0x01, /* ev_io detected read will not block */
-  EV_WRITE    =            0x02, /* ev_io detected write will not block */
-  EV__IOFDSET =            0x80, /* internal use only */
-  EV_IO       =         EV_READ, /* alias for type-detection */
-  EV_TIMER    =      0x00000100, /* timer timed out */
+    EV_UNDEF = (int)0xFFFFFFFF, /* 保证无效的值 */
+    EV_NONE = 0x00,             /* 无事件 */
+    EV_READ = 0x01,             /* ev_io检测到读取操作不会阻塞 */
+    EV_WRITE = 0x02,            /* ev_io检测到写入操作不会阻塞 */
+    EV__IOFDSET = 0x80,         /* 仅内部使用 */
+    EV_IO = EV_READ,            /* 用于类型检测的别名 */
+    EV_TIMER = 0x00000100,      /* 定时器超时 */
 #if EV_COMPAT3
-  EV_TIMEOUT  =        EV_TIMER, /* pre 4.0 API compatibility */
+    EV_TIMEOUT = EV_TIMER, /* 4.0之前API的兼容性定义 */
 #endif
-  EV_PERIODIC =      0x00000200, /* periodic timer timed out */
-  EV_SIGNAL   =      0x00000400, /* signal was received */
-  EV_CHILD    =      0x00000800, /* child/pid had status change */
-  EV_STAT     =      0x00001000, /* stat data changed */
-  EV_IDLE     =      0x00002000, /* event loop is idling */
-  EV_PREPARE  =      0x00004000, /* event loop about to poll */
-  EV_CHECK    =      0x00008000, /* event loop finished poll */
-  EV_EMBED    =      0x00010000, /* embedded event loop needs sweep */
-  EV_FORK     =      0x00020000, /* event loop resumed in child */
-  EV_CLEANUP  =      0x00040000, /* event loop resumed in child */
-  EV_ASYNC    =      0x00080000, /* async intra-loop signal */
-  EV_CUSTOM   =      0x01000000, /* for use by user code */
-  EV_ERROR    = (int)0x80000000  /* sent when an error occurs */
+    EV_PERIODIC = 0x00000200,  /* 周期性定时器超时 */
+    EV_SIGNAL = 0x00000400,    /* 接收到信号 */
+    EV_CHILD = 0x00000800,     /* 子进程/PID状态改变 */
+    EV_STAT = 0x00001000,      /* 统计信息数据变更 */
+    EV_IDLE = 0x00002000,      /* 事件循环处于空闲状态 */
+    EV_PREPARE = 0x00004000,   /* 事件循环即将轮询 */
+    EV_CHECK = 0x00008000,     /* 事件循环完成轮询 */
+    EV_EMBED = 0x00010000,     /* 嵌入式事件循环需要清理 */
+    EV_FORK = 0x00020000,      /* 子进程中恢复事件循环 */
+    EV_CLEANUP = 0x00040000,   /* 子进程中恢复事件循环 */
+    EV_ASYNC = 0x00080000,     /* 循环内异步信号 */
+    EV_CUSTOM = 0x01000000,    /* 供用户代码使用 */
+    EV_ERROR = (int)0x80000000 /* 发生错误时发送 */
 };
 
 /* can be used to add custom fields to all watchers, while losing binary compatibility */
 #ifndef EV_COMMON
-# define EV_COMMON void *data;
+#define EV_COMMON void *data;
 #endif
 
 #ifndef EV_CB_DECLARE
-# define EV_CB_DECLARE(type) void (*cb)(EV_P_ struct type *w, int revents);
+#define EV_CB_DECLARE(type) void (*cb)(struct ev_loop * loop, struct type * w, int revents);
 #endif
 #ifndef EV_CB_INVOKE
-# define EV_CB_INVOKE(watcher,revents) (watcher)->cb (EV_A_ (watcher), (revents))
+#define EV_CB_INVOKE(watcher, revents) (watcher)->cb(loop, (watcher), (revents))
 #endif
 
 /* not official, do not use */
-#define EV_CB(type,name) void name (EV_P_ struct ev_ ## type *w, int revents)
+#define EV_CB(type, name) void name(struct ev_loop *loop, struct ev_##type *w, int revents)
 
-/*
- * struct member types:
- * private: you may look at them, but not change them,
- *          and they might not mean anything to you.
- * ro: can be read anytime, but only changed when the watcher isn't active.
- * rw: can be read and modified anytime, even when the watcher is active.
- *
- * some internal details that might be helpful for debugging:
- *
- * active is either 0, which means the watcher is not active,
- *           or the array index of the watcher (periodics, timers)
- *           or the array index + 1 (most other watchers)
- *           or simply 1 for watchers that aren't in some array.
- * pending is either 0, in which case the watcher isn't,
- *           or the array index + 1 in the pendings array.
- */
+    /*
+     * 结构体成员类型说明：
+     * private（私有）：可查看但不可修改，其含义可能对使用者无实际意义。
+     * ro（只读）：随时可读取，但仅在watcher未激活时允许修改。
+     * rw（读写）：随时可读取和修改，即使watcher处于激活状态。
+     *
+     * 以下为有助于调试的内部实现细节：
+     *
+     * active 状态值含义：
+     *   0 - 表示watcher未激活
+     *   int -  periodics watcher 和 timers periodics的位置
+     *   int + 1 - 大多数其他类型watcher的位置
+     *   1 - 表示不属于任何数组的独立watcher
+     *
+     * pending 状态值含义：
+     *   0 - 表示watcher未处于pending状态
+     *   int + 1 - 该whacher在pending数组中的位置
+     */
 
+// 是否定义优先级
 #if EV_MINPRI == EV_MAXPRI
-# define EV_DECL_PRIORITY
-#elif !defined (EV_DECL_PRIORITY)
-# define EV_DECL_PRIORITY int priority;
+#define EV_DECL_PRIORITY
+#elif !defined(EV_DECL_PRIORITY)
+#define EV_DECL_PRIORITY int priority
 #endif
 
 /* shared by all watchers */
-#define EV_WATCHER(type)			\
-  int active; /* private */			\
-  int pending; /* private */			\
-  EV_DECL_PRIORITY /* private */		\
-  EV_COMMON /* rw */				\
-  EV_CB_DECLARE (type) /* private */
+#define EV_WATCHER(type)              \
+    int active;         /* private */ \
+    int pending;        /* private */ \
+    EV_DECL_PRIORITY;   /* private */ \
+    EV_COMMON           /* rw */      \
+    EV_CB_DECLARE(type) /* private */
 
-#define EV_WATCHER_LIST(type)			\
-  EV_WATCHER (type)				\
-  struct ev_watcher_list *next; /* private */
+#define EV_WATCHER_LIST(type) \
+    EV_WATCHER(type)          \
+    struct ev_watcher_list *next; /* private */
 
-#define EV_WATCHER_TIME(type)			\
-  EV_WATCHER (type)				\
-  ev_tstamp at;     /* private */
+#define EV_WATCHER_TIME(type) \
+    EV_WATCHER(type)          \
+    ev_tstamp at; /* private */
 
-/* base class, nothing to see here unless you subclass */
-typedef struct ev_watcher
-{
-  EV_WATCHER (ev_watcher)
+/* 基础类，除非你要继承它，否则无需关注 */
+typedef struct ev_watcher {
+    int active;
+    int pending;
+    int priority;
+    void *data;
+    void (*cb)(struct ev_loop *loop, struct ev_watcher *w, int revents);
 } ev_watcher;
 
-/* base class, nothing to see here unless you subclass */
-typedef struct ev_watcher_list
-{
-  EV_WATCHER_LIST (ev_watcher_list)
+/* 基础类，除非你要继承它，否则无需关注 */
+typedef struct ev_watcher_list {
+    int active;
+    int pending;
+    int priority;
+    void *data;
+    void (*cb)(struct ev_loop *loop, struct ev_watcher_list *w, int revents);
+    struct ev_watcher_list *next;
 } ev_watcher_list;
 
-/* base class, nothing to see here unless you subclass */
-typedef struct ev_watcher_time
-{
-  EV_WATCHER_TIME (ev_watcher_time)
+/* 基础类，除非你要继承它，否则无需关注 */
+typedef struct ev_watcher_time {
+    int active; // watcher的激活状态；0-未激活，1-已激活
+    int pending; // 在pending数组中的位置
+    int priority; // 优先级
+    void *data;
+    void (*cb)(struct ev_loop *loop, struct ev_watcher_time *w, int revents);
+    ev_tstamp at;
 } ev_watcher_time;
 
-/* invoked when fd is either EV_READable or EV_WRITEable */
-/* revent EV_READ, EV_WRITE */
-typedef struct ev_io
-{
-  EV_WATCHER_LIST (ev_io)
-
-  int fd;     /* ro */
-  int events; /* ro */
+/* 当文件描述符(fd)可读(EV_READ)或可写(EV_WRITE)时被调用 */
+/* 事件类型：可读事件、可写事件 */
+typedef struct ev_io {
+    EV_WATCHER_LIST (ev_io)
+    int fd;     /* ro */
+    int events; /* ro */
 } ev_io;
 
-/* invoked after a specific time, repeatable (based on monotonic clock) */
-/* revent EV_TIMEOUT */
-typedef struct ev_timer
-{
-  EV_WATCHER_TIME (ev_timer)
-
-  ev_tstamp repeat; /* rw */
+/* 在特定时间后调用，可重复（基于单调时钟）, 重新触发事件 EV_TIMEOUT */
+typedef struct ev_timer {
+    EV_WATCHER_TIME (ev_timer)
+    ev_tstamp repeat; /* 可读写 */
 } ev_timer;
 
-/* invoked at some specific time, possibly repeating at regular intervals (based on UTC) */
-/* revent EV_PERIODIC */
-typedef struct ev_periodic
-{
-  EV_WATCHER_TIME (ev_periodic)
+/* 在特定时间触发，可能基于UTC时间定期重复执行 */
+/* 事件类型：EV_PERIODIC（周期性事件） */
+typedef struct ev_periodic {
+    EV_WATCHER_TIME (ev_periodic)  /* 基础时间监视器宏 */
 
-  ev_tstamp offset; /* rw */
-  ev_tstamp interval; /* rw */
-  ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now) EV_THROW; /* rw */
+    ev_tstamp offset; /* 可读写 时间偏移量 */
+    ev_tstamp interval; /* 可读写 触发间隔 */
+    ev_tstamp (*reschedule_cb)(struct ev_periodic *w, ev_tstamp now) noexcept; /* 可读写 重新调度回调函数 */
 } ev_periodic;
 
-/* invoked when the given signal has been received */
-/* revent EV_SIGNAL */
-typedef struct ev_signal
-{
-  EV_WATCHER_LIST (ev_signal)
-
-  int signum; /* ro */
+/* 当接收到指定信号时被调用 */
+/* 重新事件 EV_SIGNAL */
+typedef struct ev_signal {
+    EV_WATCHER_LIST (ev_signal)
+    int signum; /* 只读 */
 } ev_signal;
 
-/* invoked when sigchld is received and waitpid indicates the given pid */
-/* revent EV_CHILD */
-/* does not support priorities */
-typedef struct ev_child
-{
-  EV_WATCHER_LIST (ev_child)
+/* 当接收到SIGCHLD信号且waitpid返回指定pid时触发 */
+/* 事件类型为EV_CHILD, 不支持优先级设置 */
+typedef struct ev_child {
+    EV_WATCHER_LIST (ev_child) /* 监控器链表宏 */
 
-  int flags;   /* private */
-  int pid;     /* ro */
-  int rpid;    /* rw, holds the received pid */
-  int rstatus; /* rw, holds the exit status, use the macros from sys/wait.h */
+    int flags;   /* 私有标志位 */
+    int pid;     /* 只读，监控的子进程ID */
+    int rpid;    /* 可读写，实际接收到的进程ID */
+    int rstatus; /* 可读写，保存退出状态，需使用sys/wait.h中的宏进行解析 */
 } ev_child;
 
 #if EV_STAT_ENABLE
 /* st_nlink = 0 means missing file or other error */
-# ifdef _WIN32
+#ifdef _WIN32
 typedef struct _stati64 ev_statdata;
-# else
+#else
 typedef struct stat ev_statdata;
-# endif
+#endif
 
-/* invoked each time the stat data changes for a given path */
-/* revent EV_STAT */
-typedef struct ev_stat
-{
-  EV_WATCHER_LIST (ev_stat)
+/* 每次文件元数据发生变化时通知 EV_STAT */
+typedef struct ev_stat {
+    EV_WATCHER_LIST(ev_stat)  /* 监控器列表宏 */
 
-  ev_timer timer;     /* private */
-  ev_tstamp interval; /* ro */
-  const char *path;   /* ro */
-  ev_statdata prev;   /* ro */
-  ev_statdata attr;   /* ro */
+    ev_timer timer;     /* 内部使用的定时器 */
+    ev_tstamp interval; /* 只读属性：监控间隔 */
+    const char *path;   /* 只读属性：监控路径 */
+    ev_statdata prev;   /* 只读属性：前次状态数据 */
+    ev_statdata attr;   /* 只读属性：当前属性数据 */
 
-  int wd; /* wd for inotify, fd for kqueue */
+    int wd; /* inotify机制使用的监控描述符/kqueue机制使用的文件描述符 */
 } ev_stat;
 #endif
 
 #if EV_IDLE_ENABLE
-/* invoked when the nothing else needs to be done, keeps the process from blocking */
-/* revent EV_IDLE */
-typedef struct ev_idle
-{
-  EV_WATCHER (ev_idle)
+/* 当没有其他任务需要处理时调用，防止进程阻塞，重新触发EV_IDLE事件 */
+typedef struct ev_idle {
+    EV_WATCHER(ev_idle)
 } ev_idle;
 #endif
 
-/* invoked for each run of the mainloop, just before the blocking call */
-/* you can still change events in any way you like */
-/* revent EV_PREPARE */
-typedef struct ev_prepare
-{
-  EV_WATCHER (ev_prepare)
+/* 每次主循环运行前调用，恰好在阻塞调用之前 */
+/* 此时仍可任意修改事件设置，事件类型：EV_PREPARE */
+typedef struct ev_prepare {
+    EV_WATCHER (ev_prepare)
 } ev_prepare;
 
-/* invoked for each run of the mainloop, just after the blocking call */
-/* revent EV_CHECK */
-typedef struct ev_check
-{
-  EV_WATCHER (ev_check)
+/* 每次主循环运行后立即调用，紧跟在阻塞调用之后，事件类型：EV_CHECK */
+typedef struct ev_check{
+    EV_WATCHER (ev_check)  /* 事件监视器宏 */
 } ev_check;
 
 #if EV_FORK_ENABLE
-/* the callback gets invoked before check in the child process when a fork was detected */
-/* revent EV_FORK */
-typedef struct ev_fork
-{
-  EV_WATCHER (ev_fork)
-} ev_fork;
+    /* 当检测到fork操作时，该回调函数会在子进程中进行检查前被调用 */
+    /* 事件类型：EV_FORK */
+    typedef struct ev_fork{
+        EV_WATCHER (ev_fork)
+    } ev_fork;
 #endif
 
 #if EV_CLEANUP_ENABLE
-/* is invoked just before the loop gets destroyed */
-/* revent EV_CLEANUP */
-typedef struct ev_cleanup
-{
-  EV_WATCHER (ev_cleanup)
-} ev_cleanup;
+    /* 该回调函数恰好在事件循环被销毁前调用 */
+    /* 事件类型：EV_CLEANUP */
+    typedef struct ev_cleanup{
+        EV_WATCHER (ev_cleanup)
+    } ev_cleanup;
 #endif
 
 #if EV_EMBED_ENABLE
-/* used to embed an event loop inside another */
-/* the callback gets invoked when the event loop has handled events, and can be 0 */
-typedef struct ev_embed
-{
-  EV_WATCHER (ev_embed)
+    /* 用于将一个事件循环嵌入到另一个事件循环中 */
+    /* 当事件循环处理完事件后会调用该回调函数，该回调可设为0 */
+    typedef struct ev_embed{
+        EV_WATCHER (ev_embed)
 
-  struct ev_loop *other; /* ro */
-  ev_io io;              /* private */
-  ev_prepare prepare;    /* private */
-  ev_check check;        /* unused */
-  ev_timer timer;        /* unused */
-  ev_periodic periodic;  /* unused */
-  ev_idle idle;          /* unused */
-  ev_fork fork;          /* private */
+        struct ev_loop *other; /* 只读 */
+        ev_io io;              /* 私有 */
+        ev_prepare prepare;    /* 私有 */
+        ev_check check;        /* 未使用 */
+        ev_timer timer;        /* 未使用 */
+        ev_periodic periodic;  /* 未使用 */
+        ev_idle idle;          /* 未使用 */
+        ev_fork fork;          /* 私有 */
 #if EV_CLEANUP_ENABLE
-  ev_cleanup cleanup;    /* unused */
+        ev_cleanup cleanup;    /* 未使用 */
 #endif
-} ev_embed;
+    } ev_embed;
 #endif
 
 #if EV_ASYNC_ENABLE
-/* invoked when somebody calls ev_async_send on the watcher */
-/* revent EV_ASYNC */
-typedef struct ev_async
-{
-  EV_WATCHER (ev_async)
+    /* invoked when somebody calls ev_async_send on the watcher */
+    /* revent EV_ASYNC */
+    typedef struct ev_async{
+        EV_WATCHER (ev_async)
 
-  EV_ATOMIC_T sent; /* private */
-} ev_async;
+        EV_ATOMIC_T sent; /* private */
+    } ev_async;
 
-# define ev_async_pending(w) (+(w)->sent)
+#define ev_async_pending(w) (+(w)->sent)
 #endif
 
 /* the presence of this union forces similar struct layout */
 union ev_any_watcher
 {
-  struct ev_watcher w;
-  struct ev_watcher_list wl;
+    struct ev_watcher w;
+    struct ev_watcher_list wl;
 
-  struct ev_io io;
-  struct ev_timer timer;
-  struct ev_periodic periodic;
-  struct ev_signal signal;
-  struct ev_child child;
+    struct ev_io io;
+    struct ev_timer timer;
+    struct ev_periodic periodic;
+    struct ev_signal signal;
+    struct ev_child child;
 #if EV_STAT_ENABLE
-  struct ev_stat stat;
+    struct ev_stat stat;
 #endif
 #if EV_IDLE_ENABLE
-  struct ev_idle idle;
+    struct ev_idle idle;
 #endif
-  struct ev_prepare prepare;
-  struct ev_check check;
+    struct ev_prepare prepare;
+    struct ev_check check;
 #if EV_FORK_ENABLE
-  struct ev_fork fork;
+    struct ev_fork fork;
 #endif
 #if EV_CLEANUP_ENABLE
-  struct ev_cleanup cleanup;
+    struct ev_cleanup cleanup;
 #endif
 #if EV_EMBED_ENABLE
-  struct ev_embed embed;
+    struct ev_embed embed;
 #endif
 #if EV_ASYNC_ENABLE
-  struct ev_async async;
+    struct ev_async async;
 #endif
 };
 
-/* flag bits for ev_default_loop and ev_loop_new */
+/* 用于ev_default_loop和ev_loop_new的标志位 */
 enum {
-  /* the default */
-  EVFLAG_AUTO      = 0x00000000U, /* not quite a mask */
-  /* flag bits */
-  EVFLAG_NOENV     = 0x01000000U, /* do NOT consult environment */
-  EVFLAG_FORKCHECK = 0x02000000U, /* check for a fork in each iteration */
-  /* debugging/feature disable */
-  EVFLAG_NOINOTIFY = 0x00100000U, /* do not attempt to use inotify */
+    /* 默认值 */
+    EVFLAG_AUTO      = 0x00000000U, /* 非严格意义上的掩码 */
+    /* 标志位 */
+    EVFLAG_NOENV     = 0x01000000U, /* 不读取环境变量 */
+    EVFLAG_FORKCHECK = 0x02000000U, /* 每次迭代检查fork事件 */
+    /* 调试/功能禁用 */
+    EVFLAG_NOINOTIFY = 0x00100000U, /* 禁止使用inotify */
 #if EV_COMPAT3
-  EVFLAG_NOSIGFD   = 0, /* compatibility to pre-3.9 */
+    EVFLAG_NOSIGFD   = 0, /* 兼容3.9之前版本 */
 #endif
-  EVFLAG_SIGNALFD  = 0x00200000U, /* attempt to use signalfd */
-  EVFLAG_NOSIGMASK = 0x00400000U  /* avoid modifying the signal mask */
+    EVFLAG_SIGNALFD  = 0x00200000U, /* 尝试使用signalfd */
+    EVFLAG_NOSIGMASK = 0x00400000U  /* 避免修改信号掩码 */
 };
 
-/* method bits to be ored together */
+/* 需要按位或组合的方法标志位 */
 enum {
-  EVBACKEND_SELECT  = 0x00000001U, /* about anywhere */
-  EVBACKEND_POLL    = 0x00000002U, /* !win */
-  EVBACKEND_EPOLL   = 0x00000004U, /* linux */
-  EVBACKEND_KQUEUE  = 0x00000008U, /* bsd */
-  EVBACKEND_DEVPOLL = 0x00000010U, /* solaris 8 */ /* NYI */
-  EVBACKEND_PORT    = 0x00000020U, /* solaris 10 */
-  EVBACKEND_ALL     = 0x0000003FU, /* all known backends */
-  EVBACKEND_MASK    = 0x0000FFFFU  /* all future backends */
+    EVBACKEND_SELECT  = 0x00000001U, /* about anywhere */
+    EVBACKEND_POLL    = 0x00000002U, /* !win */
+    EVBACKEND_EPOLL   = 0x00000004U, /* linux */
+    EVBACKEND_KQUEUE  = 0x00000008U, /* bsd */
+    EVBACKEND_DEVPOLL = 0x00000010U, /* solaris 8 */ /* NYI */
+    EVBACKEND_PORT    = 0x00000020U, /* solaris 10 */
+    EVBACKEND_ALL     = 0x0000003FU, /* all known backends */
+    EVBACKEND_MASK    = 0x0000FFFFU  /* all future backends */
 };
 
 #if EV_PROTOTYPES
-EV_API_DECL int ev_version_major (void) EV_THROW;
-EV_API_DECL int ev_version_minor (void) EV_THROW;
+    EV_API_DECL int ev_version_major (void) noexcept;
+    EV_API_DECL int ev_version_minor (void) noexcept;
 
-EV_API_DECL unsigned int ev_supported_backends (void) EV_THROW;
-EV_API_DECL unsigned int ev_recommended_backends (void) EV_THROW;
-EV_API_DECL unsigned int ev_embeddable_backends (void) EV_THROW;
+    EV_API_DECL unsigned int ev_supported_backends (void) noexcept;
+    EV_API_DECL unsigned int ev_recommended_backends (void) noexcept;
+    EV_API_DECL unsigned int ev_embeddable_backends (void) noexcept;
 
-EV_API_DECL ev_tstamp ev_time (void) EV_THROW;
-EV_API_DECL void ev_sleep (ev_tstamp delay) EV_THROW; /* sleep for a while */
+    // 返回 libev 当前使用的时间。请注意， ev_now 函数通常更快，且常返回你实际想了解的时间戳。同样有趣的是 ev_now_update 和 ev_now 的组合。
+    EV_API_DECL ev_tstamp ev_time (void) noexcept;
 
-/* Sets the allocation function to use, works like realloc.
- * It is used to allocate and free memory.
- * If it returns zero when memory needs to be allocated, the library might abort
- * or take some potentially destructive action.
- * The default is your system realloc function.
- */
-EV_API_DECL void ev_set_allocator (void *(*cb)(void *ptr, long size) EV_THROW) EV_THROW;
+    // 休眠给定的时间间隔 亚秒级，
+    EV_API_DECL void ev_sleep (ev_tstamp delay) noexcept; /* sleep for a while */
 
-/* set the callback function to call on a
- * retryable syscall error
- * (such as failed select, poll, epoll_wait)
- */
-EV_API_DECL void ev_set_syserr_cb (void (*cb)(const char *msg) EV_THROW) EV_THROW;
+    /* 设置要使用的内存分配函数，功能类似于realloc。
+    * 该函数用于分配和释放内存。
+    * 当需要分配内存时若返回零值，库可能会中止运行
+    * 或采取某些可能造成破坏的操作。
+    * 默认使用系统自带的realloc函数。
+    */
+    EV_API_DECL void ev_set_allocator (void *(*cb)(void *ptr, long size) noexcept) noexcept;
+
+    /* 设置当发生可重试系统调用错误时
+    * 需要调用的回调函数
+    * (例如失败的select、poll或epoll_wait操作)
+    */
+    EV_API_DECL void ev_set_syserr_cb (void (*cb)(const char *msg) noexcept) noexcept;
 
 #if EV_MULTIPLICITY
 
-/* the default loop is the only one that handles signals and child watchers */
-/* you can call this as often as you like */
-EV_API_DECL struct ev_loop *ev_default_loop (unsigned int flags EV_CPP (= 0)) EV_THROW;
+        /* the default loop is the only one that handles signals and child watchers */
+        /* you can call this as often as you like */
+        EV_API_DECL struct ev_loop *ev_default_loop (unsigned int flags EV_CPP (= 0)) noexcept;
 
 #ifdef EV_API_STATIC
-EV_API_DECL struct ev_loop *ev_default_loop_ptr;
+            EV_API_DECL struct ev_loop *ev_default_loop_ptr;
 #endif
 
-EV_INLINE struct ev_loop *
-ev_default_loop_uc_ (void) EV_THROW
-{
-  extern struct ev_loop *ev_default_loop_ptr;
+        EV_INLINE struct ev_loop * ev_default_loop_uc_ (void) noexcept{
+            extern struct ev_loop *ev_default_loop_ptr;
 
-  return ev_default_loop_ptr;
-}
+            return ev_default_loop_ptr;
+        }
 
-EV_INLINE int
-ev_is_default_loop (EV_P) EV_THROW
-{
-  return EV_A == EV_DEFAULT_UC;
-}
+        EV_INLINE int
+        ev_is_default_loop (struct ev_loop *loop) noexcept {
+            return EV_A == EV_DEFAULT_UC;   
+        }
 
-/* create and destroy alternative loops that don't handle signals */
-EV_API_DECL struct ev_loop *ev_loop_new (unsigned int flags EV_CPP (= 0)) EV_THROW;
+        /* create and destroy alternative loops that don't handle signals */
+        EV_API_DECL struct ev_loop *ev_loop_new (unsigned int flags EV_CPP (= 0)) noexcept;
 
-EV_API_DECL ev_tstamp ev_now (EV_P) EV_THROW; /* time w.r.t. timers and the eventloop, updated after each poll */
+        EV_API_DECL ev_tstamp ev_now (struct ev_loop *loop) noexcept; /* time w.r.t. timers and the eventloop, updated after each poll */
 
 #else
+        EV_API_DECL int ev_default_loop (unsigned int flags EV_CPP (= 0)) noexcept; /* returns true when successful */
 
-EV_API_DECL int ev_default_loop (unsigned int flags EV_CPP (= 0)) EV_THROW; /* returns true when successful */
+        EV_API_DECL ev_tstamp ev_rt_now;
 
-EV_API_DECL ev_tstamp ev_rt_now;
+        EV_INLINE ev_tstamp
+        ev_now (void) noexcept {
+            return ev_rt_now;
+        }
 
-EV_INLINE ev_tstamp
-ev_now (void) EV_THROW
-{
-  return ev_rt_now;
-}
-
-/* looks weird, but ev_is_default_loop (EV_A) still works if this exists */
-EV_INLINE int
-ev_is_default_loop (void) EV_THROW
-{
-  return 1;
-}
+        /* looks weird, but ev_is_default_loop (loop) still works if this exists */
+        EV_INLINE int
+        ev_is_default_loop (void) noexcept {
+            return 1;
+        }
 
 #endif /* multiplicity */
 
-/* destroy event loops, also works for the default loop */
-EV_API_DECL void ev_loop_destroy (EV_P);
+    /* destroy event loops, also works for the default loop */
+    EV_API_DECL void ev_loop_destroy (struct ev_loop *loop);
 
-/* this needs to be called after fork, to duplicate the loop */
-/* when you want to re-use it in the child */
-/* you can call it in either the parent or the child */
-/* you can actually call it at any time, anywhere :) */
-EV_API_DECL void ev_loop_fork (EV_P) EV_THROW;
+    /* 该函数需要在fork之后调用，用于复制循环 */
+    /* 当你想在子进程中复用这个循环时使用 */
+    /* 可以在父进程或子进程中调用它 */
+    /* 实际上你可以在任何时间、任何位置调用它 :) */
+    EV_API_DECL void ev_loop_fork (struct ev_loop *loop) noexcept;
 
-EV_API_DECL unsigned int ev_backend (EV_P) EV_THROW; /* backend in use by loop */
+    EV_API_DECL unsigned int ev_backend (struct ev_loop *loop) noexcept; /* backend in use by loop */
 
-EV_API_DECL void ev_now_update (EV_P) EV_THROW; /* update event loop time */
+    EV_API_DECL void ev_now_update (struct ev_loop *loop) noexcept; /* update event loop time */
 
 #if EV_WALK_ENABLE
-/* walk (almost) all watchers in the loop of a given type, invoking the */
-/* callback on every such watcher. The callback might stop the watcher, */
-/* but do nothing else with the loop */
-EV_API_DECL void ev_walk (EV_P_ int types, void (*cb)(EV_P_ int type, void *w)) EV_THROW;
+        /* 遍历指定类型的所有（近乎全部）监视器，对每个监视器调用回调函数 */
+        /* 回调函数可以停止监视器，但不对事件循环进行其他操作 */
+        EV_API_DECL void ev_walk (struct ev_loop *loop,  int types, void (*cb)(struct ev_loop *loop,  int type, void *w)) noexcept;
 #endif
 
 #endif /* prototypes */
 
 /* ev_run flags values */
 enum {
-  EVRUN_NOWAIT = 1, /* do not block/wait */
-  EVRUN_ONCE   = 2  /* block *once* only */
+    EVRUN_NOWAIT = 1, /* do not block/wait */
+    EVRUN_ONCE   = 2  /* block *once* only */
 };
 
 /* ev_break how values */
 enum {
-  EVBREAK_CANCEL = 0, /* undo unloop */
-  EVBREAK_ONE    = 1, /* unloop once */
-  EVBREAK_ALL    = 2  /* unloop all loops */
+    EVBREAK_CANCEL = 0, /* undo unloop */
+    EVBREAK_ONE    = 1, /* unloop once */
+    EVBREAK_ALL    = 2  /* unloop all loops */
 };
 
 #if EV_PROTOTYPES
-EV_API_DECL int  ev_run (EV_P_ int flags EV_CPP (= 0));
-EV_API_DECL void ev_break (EV_P_ int how EV_CPP (= EVBREAK_ONE)) EV_THROW; /* break out of the loop */
+    EV_API_DECL int  ev_run (struct ev_loop *loop,  int flags EV_CPP (= 0));
+    EV_API_DECL void ev_break (struct ev_loop *loop,  int how EV_CPP (= EVBREAK_ONE)) noexcept; /* break out of the loop */
 
-/*
- * ref/unref can be used to add or remove a refcount on the mainloop. every watcher
- * keeps one reference. if you have a long-running watcher you never unregister that
- * should not keep ev_loop from running, unref() after starting, and ref() before stopping.
- */
-EV_API_DECL void ev_ref   (EV_P) EV_THROW;
-EV_API_DECL void ev_unref (EV_P) EV_THROW;
+    /*
+    * ref/unref 可用于在主循环上增加或减少引用计数。每个监视器都会持有一个引用。
+    * 若您有一个长期运行的监视器从未注销，但又不希望它阻止ev_loop运行，
+    * 可在启动后调用unref()，在停止前调用ref()。
+    */
+    EV_API_DECL void ev_ref   (struct ev_loop *loop) noexcept;
+    EV_API_DECL void ev_unref (struct ev_loop *loop) noexcept;
 
-/*
- * convenience function, wait for a single event, without registering an event watcher
- * if timeout is < 0, do wait indefinitely
- */
-EV_API_DECL void ev_once (EV_P_ int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg) EV_THROW;
+    /*
+    * 便捷函数：等待单个事件触发，无需注册事件监视器
+    * 若timeout参数小于0，则无限期等待
+    */
+    EV_API_DECL void ev_once (struct ev_loop *loop, int fd, int events, ev_tstamp timeout, void (*cb)(int revents, void *arg), void *arg) noexcept;
+#if EV_FEATURE_API
+    EV_API_DECL unsigned int ev_iteration (struct ev_loop *loop) noexcept; /* number of loop iterations */
+    EV_API_DECL unsigned int ev_depth     (struct ev_loop *loop) noexcept; /* #ev_loop enters - #ev_loop leaves */
+    EV_API_DECL void         ev_verify    (struct ev_loop *loop) noexcept; /* abort if loop data corrupted */
 
-# if EV_FEATURE_API
-EV_API_DECL unsigned int ev_iteration (EV_P) EV_THROW; /* number of loop iterations */
-EV_API_DECL unsigned int ev_depth     (EV_P) EV_THROW; /* #ev_loop enters - #ev_loop leaves */
-EV_API_DECL void         ev_verify    (EV_P) EV_THROW; /* abort if loop data corrupted */
+    EV_API_DECL void ev_set_io_collect_interval (struct ev_loop *loop,  ev_tstamp interval) noexcept; /* sleep at least this time, default 0 */
+    EV_API_DECL void ev_set_timeout_collect_interval (struct ev_loop *loop,  ev_tstamp interval) noexcept; /* sleep at least this time, default 0 */
 
-EV_API_DECL void ev_set_io_collect_interval (EV_P_ ev_tstamp interval) EV_THROW; /* sleep at least this time, default 0 */
-EV_API_DECL void ev_set_timeout_collect_interval (EV_P_ ev_tstamp interval) EV_THROW; /* sleep at least this time, default 0 */
+    /* advanced stuff for threading etc. support, see docs */
+    EV_API_DECL void ev_set_userdata (struct ev_loop *loop,  void *data) noexcept;
+    EV_API_DECL void *ev_userdata (struct ev_loop *loop) noexcept;
+    typedef void (*ev_loop_callback)(struct ev_loop *loop);
+    EV_API_DECL void ev_set_invoke_pending_cb (struct ev_loop *loop,  ev_loop_callback invoke_pending_cb) noexcept;
+    /* C++ doesn't allow the use of the ev_loop_callback typedef here, so we need to spell it out */
+    EV_API_DECL void ev_set_loop_release_cb (struct ev_loop *loop,  void (*release)(struct ev_loop *loop) noexcept, void (*acquire)(struct ev_loop *loop) noexcept) noexcept;
 
-/* advanced stuff for threading etc. support, see docs */
-EV_API_DECL void ev_set_userdata (EV_P_ void *data) EV_THROW;
-EV_API_DECL void *ev_userdata (EV_P) EV_THROW;
-typedef void (*ev_loop_callback)(EV_P);
-EV_API_DECL void ev_set_invoke_pending_cb (EV_P_ ev_loop_callback invoke_pending_cb) EV_THROW;
-/* C++ doesn't allow the use of the ev_loop_callback typedef here, so we need to spell it out */
-EV_API_DECL void ev_set_loop_release_cb (EV_P_ void (*release)(EV_P) EV_THROW, void (*acquire)(EV_P) EV_THROW) EV_THROW;
+    EV_API_DECL unsigned int ev_pending_count (struct ev_loop *loop) noexcept; /* number of pending events, if any */
+    EV_API_DECL void ev_invoke_pending (struct ev_loop *loop); /* invoke all pending watchers */
 
-EV_API_DECL unsigned int ev_pending_count (EV_P) EV_THROW; /* number of pending events, if any */
-EV_API_DECL void ev_invoke_pending (EV_P); /* invoke all pending watchers */
-
-/*
- * stop/start the timer handling.
- */
-EV_API_DECL void ev_suspend (EV_P) EV_THROW;
-EV_API_DECL void ev_resume  (EV_P) EV_THROW;
+    /*
+    * stop/start the timer handling.
+    */
+    EV_API_DECL void ev_suspend (struct ev_loop *loop) noexcept;
+    EV_API_DECL void ev_resume  (struct ev_loop *loop) noexcept;
 #endif
 
 #endif
 
 /* these may evaluate ev multiple times, and the other arguments at most once */
 /* either use ev_init + ev_TYPE_set, or the ev_TYPE_init macro, below, to first initialise a watcher */
-#define ev_init(ev,cb_) do {			\
-  ((ev_watcher *)(void *)(ev))->active  =	\
-  ((ev_watcher *)(void *)(ev))->pending = 0;	\
-  ev_set_priority ((ev), 0);			\
-  ev_set_cb ((ev), cb_);			\
-} while (0)
+#define ev_init(ev, cb_)                               \
+    do {                                               \
+        ((ev_watcher *)(void *)(ev))->active =         \
+            ((ev_watcher *)(void *)(ev))->pending = 0; \
+        ev_set_priority((ev), 0);                      \
+        ev_set_cb((ev), cb_);                          \
+    } while (0)
 
-#define ev_io_set(ev,fd_,events_)            do { (ev)->fd = (fd_); (ev)->events = (events_) | EV__IOFDSET; } while (0)
-#define ev_timer_set(ev,after_,repeat_)      do { ((ev_watcher_time *)(ev))->at = (after_); (ev)->repeat = (repeat_); } while (0)
-#define ev_periodic_set(ev,ofs_,ival_,rcb_)  do { (ev)->offset = (ofs_); (ev)->interval = (ival_); (ev)->reschedule_cb = (rcb_); } while (0)
-#define ev_signal_set(ev,signum_)            do { (ev)->signum = (signum_); } while (0)
-#define ev_child_set(ev,pid_,trace_)         do { (ev)->pid = (pid_); (ev)->flags = !!(trace_); } while (0)
-#define ev_stat_set(ev,path_,interval_)      do { (ev)->path = (path_); (ev)->interval = (interval_); (ev)->wd = -2; } while (0)
-#define ev_idle_set(ev)                      /* nop, yes, this is a serious in-joke */
-#define ev_prepare_set(ev)                   /* nop, yes, this is a serious in-joke */
-#define ev_check_set(ev)                     /* nop, yes, this is a serious in-joke */
-#define ev_embed_set(ev,other_)              do { (ev)->other = (other_); } while (0)
-#define ev_fork_set(ev)                      /* nop, yes, this is a serious in-joke */
-#define ev_cleanup_set(ev)                   /* nop, yes, this is a serious in-joke */
-#define ev_async_set(ev)                     /* nop, yes, this is a serious in-joke */
+#define ev_io_set(ev, fd_, events_)             \
+    do {                                        \
+        (ev)->fd = (fd_);                       \
+        (ev)->events = (events_) | EV__IOFDSET; \
+    } while (0)
 
-#define ev_io_init(ev,cb,fd,events)          do { ev_init ((ev), (cb)); ev_io_set ((ev),(fd),(events)); } while (0)
-#define ev_timer_init(ev,cb,after,repeat)    do { ev_init ((ev), (cb)); ev_timer_set ((ev),(after),(repeat)); } while (0)
-#define ev_periodic_init(ev,cb,ofs,ival,rcb) do { ev_init ((ev), (cb)); ev_periodic_set ((ev),(ofs),(ival),(rcb)); } while (0)
-#define ev_signal_init(ev,cb,signum)         do { ev_init ((ev), (cb)); ev_signal_set ((ev), (signum)); } while (0)
-#define ev_child_init(ev,cb,pid,trace)       do { ev_init ((ev), (cb)); ev_child_set ((ev),(pid),(trace)); } while (0)
-#define ev_stat_init(ev,cb,path,interval)    do { ev_init ((ev), (cb)); ev_stat_set ((ev),(path),(interval)); } while (0)
-#define ev_idle_init(ev,cb)                  do { ev_init ((ev), (cb)); ev_idle_set ((ev)); } while (0)
-#define ev_prepare_init(ev,cb)               do { ev_init ((ev), (cb)); ev_prepare_set ((ev)); } while (0)
-#define ev_check_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_check_set ((ev)); } while (0)
-#define ev_embed_init(ev,cb,other)           do { ev_init ((ev), (cb)); ev_embed_set ((ev),(other)); } while (0)
-#define ev_fork_init(ev,cb)                  do { ev_init ((ev), (cb)); ev_fork_set ((ev)); } while (0)
-#define ev_cleanup_init(ev,cb)               do { ev_init ((ev), (cb)); ev_cleanup_set ((ev)); } while (0)
-#define ev_async_init(ev,cb)                 do { ev_init ((ev), (cb)); ev_async_set ((ev)); } while (0)
+#define ev_timer_set(ev, after_, repeat_)         \
+    do {                                          \
+        ((ev_watcher_time *)(ev))->at = (after_); \
+        (ev)->repeat = (repeat_);                 \
+    } while (0)
 
-#define ev_is_pending(ev)                    (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
-#define ev_is_active(ev)                     (0 + ((ev_watcher *)(void *)(ev))->active) /* ro, true when the watcher has been started */
+#define ev_periodic_set(ev, ofs_, ival_, rcb_) \
+    do {                                       \
+        (ev)->offset = (ofs_);                 \
+        (ev)->interval = (ival_);              \
+        (ev)->reschedule_cb = (rcb_);          \
+    } while (0)
 
-#define ev_cb_(ev)                           (ev)->cb /* rw */
-#define ev_cb(ev)                            (memmove (&ev_cb_ (ev), &((ev_watcher *)(ev))->cb, sizeof (ev_cb_ (ev))), (ev)->cb)
+#define ev_signal_set(ev, signum_) \
+    do {                           \
+        (ev)->signum = (signum_);  \
+    } while (0)
+
+#define ev_child_set(ev, pid_, trace_) \
+    do {                               \
+        (ev)->pid = (pid_);            \
+        (ev)->flags = !!(trace_);      \
+    } while (0)
+
+#define ev_stat_set(ev, path_, interval_) \
+    do {                                  \
+        (ev)->path = (path_);             \
+        (ev)->interval = (interval_);     \
+        (ev)->wd = -2;                    \
+    } while (0)
+
+#define ev_idle_set(ev)    /* nop, yes, this is a serious in-joke */
+#define ev_prepare_set(ev) /* nop, yes, this is a serious in-joke */
+#define ev_check_set(ev)   /* nop, yes, this is a serious in-joke */
+#define ev_embed_set(ev, other_) \
+    do {                         \
+        (ev)->other = (other_);  \
+    } while (0)
+
+#define ev_fork_set(ev)    /* nop, yes, this is a serious in-joke */
+#define ev_cleanup_set(ev) /* nop, yes, this is a serious in-joke */
+#define ev_async_set(ev)   /* nop, yes, this is a serious in-joke */
+
+#define ev_io_init(ev, cb, fd, events)   \
+    do {                                 \
+        ev_init((ev), (cb));             \
+        ev_io_set((ev), (fd), (events)); \
+    } while (0)
+
+#define ev_timer_init(ev, cb, after, repeat)   \
+    do {                                       \
+        ev_init((ev), (cb));                   \
+        ev_timer_set((ev), (after), (repeat)); \
+    } while (0)
+#define ev_periodic_init(ev, cb, ofs, ival, rcb)     \
+    do {                                             \
+        ev_init((ev), (cb));                         \
+        ev_periodic_set((ev), (ofs), (ival), (rcb)); \
+    } while (0)
+#define ev_signal_init(ev, cb, signum) \
+    do {                               \
+        ev_init((ev), (cb));           \
+        ev_signal_set((ev), (signum)); \
+    } while (0)
+#define ev_child_init(ev, cb, pid, trace)   \
+    do {                                    \
+        ev_init((ev), (cb));                \
+        ev_child_set((ev), (pid), (trace)); \
+    } while (0)
+#define ev_stat_init(ev, cb, path, interval)   \
+    do {                                       \
+        ev_init((ev), (cb));                   \
+        ev_stat_set((ev), (path), (interval)); \
+    } while (0)
+
+#define ev_idle_init(ev, cb) \
+    do {                     \
+        ev_init((ev), (cb)); \
+        ev_idle_set((ev));   \
+    } while (0)
+
+#define ev_prepare_init(ev, cb) \
+    do {                        \
+        ev_init((ev), (cb));    \
+        ev_prepare_set((ev));   \
+    } while (0)
+
+#define ev_check_init(ev, cb) \
+    do {                      \
+        ev_init((ev), (cb));  \
+        ev_check_set((ev));   \
+    } while (0)
+
+#define ev_embed_init(ev, cb, other) \
+    do {                             \
+        ev_init((ev), (cb));         \
+        ev_embed_set((ev), (other)); \
+    } while (0)
+
+#define ev_fork_init(ev, cb) \
+    do {                     \
+        ev_init((ev), (cb)); \
+        ev_fork_set((ev));   \
+    } while (0)
+
+#define ev_cleanup_init(ev, cb) \
+    do {                        \
+        ev_init((ev), (cb));    \
+        ev_cleanup_set((ev));   \
+    } while (0)
+
+#define ev_async_init(ev, cb) \
+    do {                      \
+        ev_init((ev), (cb));  \
+        ev_async_set((ev));   \
+    } while (0)
+
+#define ev_is_pending(ev) (0 + ((ev_watcher *)(void *)(ev))->pending) /* ro, true when watcher is waiting for callback invocation */
+#define ev_is_active(ev) (0 + ((ev_watcher *)(void *)(ev))->active)   /* ro, true when the watcher has been started */
+
+#define ev_cb_(ev) (ev)->cb /* rw */
+#define ev_cb(ev) (memmove(&ev_cb_(ev), &((ev_watcher *)(ev))->cb, sizeof(ev_cb_(ev))), (ev)->cb)
 
 #if EV_MINPRI == EV_MAXPRI
-# define ev_priority(ev)                     ((ev), EV_MINPRI)
-# define ev_set_priority(ev,pri)             ((ev), (pri))
+#define ev_priority(ev) ((ev), EV_MINPRI)
+#define ev_set_priority(ev, pri) ((ev), (pri))
 #else
-# define ev_priority(ev)                     (+(((ev_watcher *)(void *)(ev))->priority))
-# define ev_set_priority(ev,pri)             (   (ev_watcher *)(void *)(ev))->priority = (pri)
+#define ev_priority(ev) (+(((ev_watcher *)(void *)(ev))->priority))
+#define ev_set_priority(ev, pri) ((ev_watcher *)(void *)(ev))->priority = (pri)
 #endif
 
-#define ev_periodic_at(ev)                   (+((ev_watcher_time *)(ev))->at)
+#define ev_periodic_at(ev) (+((ev_watcher_time *)(ev))->at)
 
-#ifndef ev_set_cb
-# define ev_set_cb(ev,cb_)                   (ev_cb_ (ev) = (cb_), memmove (&((ev_watcher *)(ev))->cb, &ev_cb_ (ev), sizeof (ev_cb_ (ev))))
+#ifndef ev_set_cb  // TODO
+#define ev_set_cb(ev, cb_) (ev_cb_(ev) = (cb_), memmove(&((ev_watcher *)(ev))->cb, &ev_cb_(ev), sizeof(ev_cb_(ev))))
 #endif
 
-/* stopping (enabling, adding) a watcher does nothing if it is already running */
-/* stopping (disabling, deleting) a watcher does nothing unless it's already running */
+/* 停止（启用、添加）监视器时，若其已在运行则无操作 */
+/* 停止（禁用、删除）监视器时，除非其已在运行否则无操作 */
 #if EV_PROTOTYPES
+    /* 向监视器注入事件，模拟真实事件发生 */
+    /* 接受任何ev_watcher类型 */
+    EV_API_DECL void ev_feed_event     (struct ev_loop *loop,  void *w, int revents) noexcept;
+    EV_API_DECL void ev_feed_fd_event  (struct ev_loop *loop,  int fd, int revents) noexcept;
 
-/* feeds an event into a watcher as if the event actually occurred */
-/* accepts any ev_watcher type */
-EV_API_DECL void ev_feed_event     (EV_P_ void *w, int revents) EV_THROW;
-EV_API_DECL void ev_feed_fd_event  (EV_P_ int fd, int revents) EV_THROW;
 #if EV_SIGNAL_ENABLE
-EV_API_DECL void ev_feed_signal    (int signum) EV_THROW;
-EV_API_DECL void ev_feed_signal_event (EV_P_ int signum) EV_THROW;
+        EV_API_DECL void ev_feed_signal    (int signum) noexcept;
+        EV_API_DECL void ev_feed_signal_event (struct ev_loop *loop,  int signum) noexcept;
 #endif
-EV_API_DECL void ev_invoke         (EV_P_ void *w, int revents);
-EV_API_DECL int  ev_clear_pending  (EV_P_ void *w) EV_THROW;
 
-EV_API_DECL void ev_io_start       (EV_P_ ev_io *w) EV_THROW;
-EV_API_DECL void ev_io_stop        (EV_P_ ev_io *w) EV_THROW;
+    EV_API_DECL void ev_invoke         (struct ev_loop *loop,  void *w, int revents);
+    EV_API_DECL int  ev_clear_pending  (struct ev_loop *loop,  void *w) noexcept;
 
-EV_API_DECL void ev_timer_start    (EV_P_ ev_timer *w) EV_THROW;
-EV_API_DECL void ev_timer_stop     (EV_P_ ev_timer *w) EV_THROW;
-/* stops if active and no repeat, restarts if active and repeating, starts if inactive and repeating */
-EV_API_DECL void ev_timer_again    (EV_P_ ev_timer *w) EV_THROW;
-/* return remaining time */
-EV_API_DECL ev_tstamp ev_timer_remaining (EV_P_ ev_timer *w) EV_THROW;
+    EV_API_DECL void ev_io_start       (struct ev_loop *loop,  ev_io *w) noexcept;
+    EV_API_DECL void ev_io_stop        (struct ev_loop *loop,  ev_io *w) noexcept;
+
+    EV_API_DECL void ev_timer_start    (struct ev_loop *loop,  ev_timer *w) noexcept;
+    EV_API_DECL void ev_timer_stop     (struct ev_loop *loop,  ev_timer *w) noexcept;
+    /* 若激活且无重复则停止，若激活且重复则重启，若未激活且重复则启动 */
+    EV_API_DECL void ev_timer_again    (struct ev_loop *loop,  ev_timer *w) noexcept;
+
+    /* 返回剩余时间 */
+    EV_API_DECL ev_tstamp ev_timer_remaining (struct ev_loop *loop,  ev_timer *w) noexcept;
 
 #if EV_PERIODIC_ENABLE
-EV_API_DECL void ev_periodic_start (EV_P_ ev_periodic *w) EV_THROW;
-EV_API_DECL void ev_periodic_stop  (EV_P_ ev_periodic *w) EV_THROW;
-EV_API_DECL void ev_periodic_again (EV_P_ ev_periodic *w) EV_THROW;
+        EV_API_DECL void ev_periodic_start (struct ev_loop *loop,  ev_periodic *w) noexcept;
+        EV_API_DECL void ev_periodic_stop  (struct ev_loop *loop,  ev_periodic *w) noexcept;
+        EV_API_DECL void ev_periodic_again (struct ev_loop *loop,  ev_periodic *w) noexcept;
 #endif
 
 /* only supported in the default loop */
 #if EV_SIGNAL_ENABLE
-EV_API_DECL void ev_signal_start   (EV_P_ ev_signal *w) EV_THROW;
-EV_API_DECL void ev_signal_stop    (EV_P_ ev_signal *w) EV_THROW;
+        EV_API_DECL void ev_signal_start   (struct ev_loop *loop,  ev_signal *w) noexcept;
+        EV_API_DECL void ev_signal_stop    (struct ev_loop *loop,  ev_signal *w) noexcept;
 #endif
 
 /* only supported in the default loop */
-# if EV_CHILD_ENABLE
-EV_API_DECL void ev_child_start    (EV_P_ ev_child *w) EV_THROW;
-EV_API_DECL void ev_child_stop     (EV_P_ ev_child *w) EV_THROW;
-# endif
+#if EV_CHILD_ENABLE
+        EV_API_DECL void ev_child_start    (struct ev_loop *loop,  ev_child *w) noexcept;
+        EV_API_DECL void ev_child_stop     (struct ev_loop *loop,  ev_child *w) noexcept;
+#endif
 
-# if EV_STAT_ENABLE
-EV_API_DECL void ev_stat_start     (EV_P_ ev_stat *w) EV_THROW;
-EV_API_DECL void ev_stat_stop      (EV_P_ ev_stat *w) EV_THROW;
-EV_API_DECL void ev_stat_stat      (EV_P_ ev_stat *w) EV_THROW;
-# endif
+#if EV_STAT_ENABLE
+        EV_API_DECL void ev_stat_start     (struct ev_loop *loop,  ev_stat *w) noexcept;
+        EV_API_DECL void ev_stat_stop      (struct ev_loop *loop,  ev_stat *w) noexcept;
+        EV_API_DECL void ev_stat_stat      (struct ev_loop *loop,  ev_stat *w) noexcept;
+#endif
 
-# if EV_IDLE_ENABLE
-EV_API_DECL void ev_idle_start     (EV_P_ ev_idle *w) EV_THROW;
-EV_API_DECL void ev_idle_stop      (EV_P_ ev_idle *w) EV_THROW;
-# endif
+#if EV_IDLE_ENABLE
+        EV_API_DECL void ev_idle_start     (struct ev_loop *loop,  ev_idle *w) noexcept;
+        EV_API_DECL void ev_idle_stop      (struct ev_loop *loop,  ev_idle *w) noexcept;
+#endif
 
 #if EV_PREPARE_ENABLE
-EV_API_DECL void ev_prepare_start  (EV_P_ ev_prepare *w) EV_THROW;
-EV_API_DECL void ev_prepare_stop   (EV_P_ ev_prepare *w) EV_THROW;
+        EV_API_DECL void ev_prepare_start  (struct ev_loop *loop,  ev_prepare *w) noexcept;
+        EV_API_DECL void ev_prepare_stop   (struct ev_loop *loop,  ev_prepare *w) noexcept;
 #endif
 
 #if EV_CHECK_ENABLE
-EV_API_DECL void ev_check_start    (EV_P_ ev_check *w) EV_THROW;
-EV_API_DECL void ev_check_stop     (EV_P_ ev_check *w) EV_THROW;
+        EV_API_DECL void ev_check_start    (struct ev_loop *loop,  ev_check *w) noexcept;
+        EV_API_DECL void ev_check_stop     (struct ev_loop *loop,  ev_check *w) noexcept;
 #endif
 
-# if EV_FORK_ENABLE
-EV_API_DECL void ev_fork_start     (EV_P_ ev_fork *w) EV_THROW;
-EV_API_DECL void ev_fork_stop      (EV_P_ ev_fork *w) EV_THROW;
-# endif
+#if EV_FORK_ENABLE
+        EV_API_DECL void ev_fork_start     (struct ev_loop *loop,  ev_fork *w) noexcept;
+        EV_API_DECL void ev_fork_stop      (struct ev_loop *loop,  ev_fork *w) noexcept;
+#endif
 
-# if EV_CLEANUP_ENABLE
-EV_API_DECL void ev_cleanup_start  (EV_P_ ev_cleanup *w) EV_THROW;
-EV_API_DECL void ev_cleanup_stop   (EV_P_ ev_cleanup *w) EV_THROW;
-# endif
+#if EV_CLEANUP_ENABLE
+        EV_API_DECL void ev_cleanup_start  (struct ev_loop *loop,  ev_cleanup *w) noexcept;
+        EV_API_DECL void ev_cleanup_stop   (struct ev_loop *loop,  ev_cleanup *w) noexcept;
+#endif
 
-# if EV_EMBED_ENABLE
-/* only supported when loop to be embedded is in fact embeddable */
-EV_API_DECL void ev_embed_start    (EV_P_ ev_embed *w) EV_THROW;
-EV_API_DECL void ev_embed_stop     (EV_P_ ev_embed *w) EV_THROW;
-EV_API_DECL void ev_embed_sweep    (EV_P_ ev_embed *w) EV_THROW;
-# endif
+#if EV_EMBED_ENABLE
+        /* only supported when loop to be embedded is in fact embeddable */
+        EV_API_DECL void ev_embed_start    (struct ev_loop *loop,  ev_embed *w) noexcept;
+        EV_API_DECL void ev_embed_stop     (struct ev_loop *loop,  ev_embed *w) noexcept;
+        EV_API_DECL void ev_embed_sweep    (struct ev_loop *loop,  ev_embed *w) noexcept;
+#endif
 
-# if EV_ASYNC_ENABLE
-EV_API_DECL void ev_async_start    (EV_P_ ev_async *w) EV_THROW;
-EV_API_DECL void ev_async_stop     (EV_P_ ev_async *w) EV_THROW;
-EV_API_DECL void ev_async_send     (EV_P_ ev_async *w) EV_THROW;
-# endif
+#if EV_ASYNC_ENABLE
+        EV_API_DECL void ev_async_start    (struct ev_loop *loop,  ev_async *w) noexcept;
+        EV_API_DECL void ev_async_stop     (struct ev_loop *loop,  ev_async *w) noexcept;
+        EV_API_DECL void ev_async_send     (struct ev_loop *loop,  ev_async *w) noexcept;
+#endif
 
 #if EV_COMPAT3
-  #define EVLOOP_NONBLOCK EVRUN_NOWAIT
-  #define EVLOOP_ONESHOT  EVRUN_ONCE
-  #define EVUNLOOP_CANCEL EVBREAK_CANCEL
-  #define EVUNLOOP_ONE    EVBREAK_ONE
-  #define EVUNLOOP_ALL    EVBREAK_ALL
-  #if EV_PROTOTYPES
-    EV_INLINE void ev_loop   (EV_P_ int flags) { ev_run   (EV_A_ flags); }
-    EV_INLINE void ev_unloop (EV_P_ int how  ) { ev_break (EV_A_ how  ); }
+#define EVLOOP_NONBLOCK EVRUN_NOWAIT
+#define EVLOOP_ONESHOT EVRUN_ONCE
+#define EVUNLOOP_CANCEL EVBREAK_CANCEL
+#define EVUNLOOP_ONE EVBREAK_ONE
+#define EVUNLOOP_ALL EVBREAK_ALL
+#if EV_PROTOTYPES
+    EV_INLINE void ev_loop   (struct ev_loop *loop,  int flags) { ev_run   (loop, flags); }
+    EV_INLINE void ev_unloop (struct ev_loop *loop,  int how  ) { ev_break (loop, how  ); }
     EV_INLINE void ev_default_destroy (void) { ev_loop_destroy (EV_DEFAULT); }
     EV_INLINE void ev_default_fork    (void) { ev_loop_fork    (EV_DEFAULT); }
-    #if EV_FEATURE_API
-      EV_INLINE unsigned int ev_loop_count  (EV_P) { return ev_iteration  (EV_A); }
-      EV_INLINE unsigned int ev_loop_depth  (EV_P) { return ev_depth      (EV_A); }
-      EV_INLINE void         ev_loop_verify (EV_P) {        ev_verify     (EV_A); }
-    #endif
-  #endif
+#if EV_FEATURE_API
+    EV_INLINE unsigned int ev_loop_count  (struct ev_loop *loop) { return ev_iteration  (loop); }
+    EV_INLINE unsigned int ev_loop_depth  (struct ev_loop *loop) { return ev_depth      (loop); }
+    EV_INLINE void         ev_loop_verify (struct ev_loop *loop) {        ev_verify     (loop); }
+#endif
+#endif
 #else
-  typedef struct ev_loop ev_loop;
+    typedef struct ev_loop ev_loop;
 #endif
 
 #endif
 
-EV_CPP(})
+EV_CPP( })
 
 #endif
-

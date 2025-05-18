@@ -99,102 +99,102 @@
 #define vec_wi ((loop)->vec_wi)
 #define vec_wo ((loop)->vec_wo)
 #else
-#undef EV_WRAP_H
-#undef acquire_cb
-#undef activecnt
-#undef anfdmax
-#undef anfds
-#undef async_pending
-#undef asynccnt
-#undef asyncmax
-#undef asyncs
-#undef backend
-#undef backend_fd
-#undef backend_mintime
-#undef backend_modify
-#undef backend_poll
-#undef checkcnt
-#undef checkmax
-#undef checks
-#undef cleanupcnt
-#undef cleanupmax
-#undef cleanups
-#undef curpid
-#undef epoll_epermcnt
-#undef epoll_epermmax
-#undef epoll_eperms
-#undef epoll_eventmax
-#undef epoll_events
-#undef evpipe
-#undef fdchangecnt
-#undef fdchangemax
-#undef fdchanges
-#undef forkcnt
-#undef forkmax
-#undef forks
-#undef fs_2625
-#undef fs_fd
-#undef fs_hash
-#undef fs_w
-#undef idleall
-#undef idlecnt
-#undef idlemax
-#undef idles
-#undef invoke_cb
-#undef io_blocktime
-#undef iocp
-#undef kqueue_changecnt
-#undef kqueue_changemax
-#undef kqueue_changes
-#undef kqueue_eventmax
-#undef kqueue_events
-#undef kqueue_fd_pid
-#undef loop_count
-#undef loop_depth
-#undef loop_done
-#undef mn_now
-#undef now_floor
-#undef origflags
-#undef pending_w
-#undef pendingcnt
-#undef pendingmax
-#undef pendingpri
-#undef pendings
-#undef periodiccnt
-#undef periodicmax
-#undef periodics
-#undef pipe_w
-#undef pipe_write_skipped
-#undef pipe_write_wanted
-#undef pollcnt
-#undef pollidxmax
-#undef pollidxs
-#undef pollmax
-#undef polls
-#undef port_eventmax
-#undef port_events
-#undef postfork
-#undef preparecnt
-#undef preparemax
-#undef prepares
-#undef release_cb
-#undef rfeedcnt
-#undef rfeedmax
-#undef rfeeds
-#undef rtmn_diff
-#undef sig_pending
-#undef sigfd
-#undef sigfd_set
-#undef sigfd_w
-#undef timeout_blocktime
-#undef timercnt
-#undef timermax
-#undef timers
-#undef userdata
-#undef vec_eo
-#undef vec_max
-#undef vec_ri
-#undef vec_ro
-#undef vec_wi
-#undef vec_wo
+// #undef EV_WRAP_H
+// #undef acquire_cb
+// #undef activecnt
+// #undef anfdmax
+// #undef anfds
+// #undef async_pending
+// #undef asynccnt
+// #undef asyncmax
+// #undef asyncs
+// #undef backend
+// #undef backend_fd
+// #undef backend_mintime
+// #undef backend_modify
+// #undef backend_poll
+// #undef checkcnt
+// #undef checkmax
+// #undef checks
+// #undef cleanupcnt
+// #undef cleanupmax
+// #undef cleanups
+// #undef curpid
+// #undef epoll_epermcnt
+// #undef epoll_epermmax
+// #undef epoll_eperms
+// #undef epoll_eventmax
+// #undef epoll_events
+// #undef evpipe
+// #undef fdchangecnt
+// #undef fdchangemax
+// #undef fdchanges
+// #undef forkcnt
+// #undef forkmax
+// #undef forks
+// #undef fs_2625
+// #undef fs_fd
+// #undef fs_hash
+// #undef fs_w
+// #undef idleall
+// #undef idlecnt
+// #undef idlemax
+// #undef idles
+// #undef invoke_cb
+// #undef io_blocktime
+// #undef iocp
+// #undef kqueue_changecnt
+// #undef kqueue_changemax
+// #undef kqueue_changes
+// #undef kqueue_eventmax
+// #undef kqueue_events
+// #undef kqueue_fd_pid
+// #undef loop_count
+// #undef loop_depth
+// #undef loop_done
+// #undef mn_now
+// #undef now_floor
+// #undef origflags
+// #undef pending_w
+// #undef pendingcnt
+// #undef pendingmax
+// #undef pendingpri
+// #undef pendings
+// #undef periodiccnt
+// #undef periodicmax
+// #undef periodics
+// #undef pipe_w
+// #undef pipe_write_skipped
+// #undef pipe_write_wanted
+// #undef pollcnt
+// #undef pollidxmax
+// #undef pollidxs
+// #undef pollmax
+// #undef polls
+// #undef port_eventmax
+// #undef port_events
+// #undef postfork
+// #undef preparecnt
+// #undef preparemax
+// #undef prepares
+// #undef release_cb
+// #undef rfeedcnt
+// #undef rfeedmax
+// #undef rfeeds
+// #undef rtmn_diff
+// #undef sig_pending
+// #undef sigfd
+// #undef sigfd_set
+// #undef sigfd_w
+// #undef timeout_blocktime
+// #undef timercnt
+// #undef timermax
+// #undef timers
+// #undef userdata
+// #undef vec_eo
+// #undef vec_max
+// #undef vec_ri
+// #undef vec_ro
+// #undef vec_wi
+// #undef vec_wo
 #endif

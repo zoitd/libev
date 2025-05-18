@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "*.swift": "swift",
+        "*.resolved": "json",
+        "*.h": "cpp",
+        "stdexcept": "cpp",
+        "bitset": "cpp"
+    }
+}
