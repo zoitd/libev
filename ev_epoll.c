@@ -21,47 +21,75 @@
 
 #define EV_EMASK_EPERM 0x80
 
-static void epoll_modify(struct ev_loop *loop, int fd, int oev, int nev) {
+/*
+ * 修改文件描述符的epoll监控事件
+ * @param loop 事件循环实例
+ * @param fd 要修改的文件描述符
+ * @param oev 原事件掩码
+ * @param nev 新事件掩码
+ *
+ * 该函数处理epoll事件注册的复杂性，包括：
+ * - 处理文件描述符可能已被内核静默移除的情况
+ * - 优化避免不必要的epoll_ctl调用
+ * - 处理EPERM特殊错误(表示fd总是就绪)
+ */
+static void epoll_modify(struct ev_loop *loop, int fd, int oev, int nev)
+{
     struct epoll_event ev;
     unsigned char oldmask;
-
     /*
-    * 我们通过在此处忽略EPOLL_CTL_DEL来处理它
-    * 基于假设fd无论如何已经消失
-    * 如果这个假设错误，我们必须在epoll_poll中处理这个虚假事件
-    * 如果fd被再次添加，我们尝试ADD操作，如果失败
-    * 我们假设它仍然具有相同的事件掩码
-    */
-    if (!nev) return;
+     * 我们通过在此处忽略EPOLL_CTL_DEL来处理它
+     * 基于假设fd无论如何已经消失
+     * 如果这个假设错误，我们必须在epoll_poll中处理这个虚假事件
+     * 如果fd被再次添加，我们尝试ADD操作，如果失败
+     * 我们假设它仍然具有相同的事件掩码
+     */
+    if (!nev)
+        return;
 
     oldmask = anfds[fd].emask;
     anfds[fd].emask = nev;
 
-    /* store the generation counter in the upper 32 bits, the fd in the lower 32 bits */
+    /*
+     * 存储生成计数器在高32位，fd在低32位
+     * 这种设计用于检测虚假通知：
+     * - 当fd被关闭并重新打开时，生成计数器会变化
+     * - 可以识别来自其他进程的虚假事件
+     */
     ev.data.u64 = (uint64_t)(uint32_t)fd | ((uint64_t)(uint32_t)++anfds[fd].egen << 32);
     ev.events = (nev & EV_READ ? EPOLLIN : 0) | (nev & EV_WRITE ? EPOLLOUT : 0);
 
-    if (!epoll_ctl(backend_fd, oev && oldmask != nev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD, fd, &ev))[[likely]]
+    if (expect_true(!epoll_ctl(backend_fd, oev && oldmask != nev ? EPOLL_CTL_MOD : EPOLL_CTL_ADD, fd, &ev)))
         return;
 
-    if (expect_true(errno == ENOENT)) {
-        /* 如果ENOENT表示fd已消失，尝试采取正确的操作 */
-        if (!nev) goto dec_egen;
+    if (expect_true(errno == ENOENT))
+    {
+        /* if ENOENT then the fd went away, so try to do the right thing */
+        if (!nev)
+            goto dec_egen;
 
-        if (!epoll_ctl(backend_fd, EPOLL_CTL_ADD, fd, &ev)) return;
+        if (!epoll_ctl(backend_fd, EPOLL_CTL_ADD, fd, &ev))
+            return;
+    }
+    else if (expect_true(errno == EEXIST))
+    {
+        /* EEXIST表示我们忽略了之前的DEL操作，但fd仍然活跃 */
+        /* 如果内核掩码与新掩码相同，我们假设它没有改变 */
+        if (oldmask == nev)
+            goto dec_egen;
 
-    } else if (expect_true(errno == EEXIST)) {
-         /* EEXIST表示我们忽略了之前的DEL操作，但fd仍然活跃 */
-            /* 如果内核掩码与新掩码相同，我们假设它没有改变 */
-        if (oldmask == nev) goto dec_egen;
-
-        if (!epoll_ctl(backend_fd, EPOLL_CTL_MOD, fd, &ev)) return;
-    } else if (errno == EPERM)[[likely]] {
-         /* EPERM表示fd总是就绪，但epoll过于挑剔,无法处理它，不像select或poll */
+        if (!epoll_ctl(backend_fd, EPOLL_CTL_MOD, fd, &ev))
+            return;
+    }
+    else if (expect_true(errno == EPERM))
+    {
+        /* EPERM表示fd总是就绪，但epoll过于挑剔 */
+        /* 无法处理它，不像select或poll */
         anfds[fd].emask = EV_EMASK_EPERM;
 
         /* add fd to epoll_eperms, if not already inside */
-        if (!(oldmask & EV_EMASK_EPERM)) {
+        if (!(oldmask & EV_EMASK_EPERM))
+        {
             array_needsize(int, epoll_eperms, epoll_epermmax, epoll_epermcnt + 1, EMPTY2);
             epoll_eperms[epoll_epermcnt++] = fd;
         }
@@ -76,11 +104,23 @@ dec_egen:
     --anfds[fd].egen;
 }
 
-static void epoll_poll(struct ev_loop *loop, ev_t   stamp timeout) {
+/*
+ * 执行epoll_wait并处理返回的事件
+ * @param loop 事件循环实例
+ * @param timeout 最大等待时间(秒)
+ *
+ * 该函数负责：
+ * - 调用epoll_wait获取就绪事件
+ * - 处理虚假通知(通过生成计数器检测)
+ * - 处理EPERM特殊情况的文件描述符
+ * - 动态调整事件数组大小
+ */
+static void epoll_poll(struct ev_loop *loop, ev_tstamp timeout)
+{
     int i;
     int eventcnt;
 
-    if (expect_false(epoll_epermcnt))
+    if (epoll_epermcnt) [[unlikely]]
         timeout = 0.;
 
     /* epoll wait times cannot be larger than (LONG_MAX - 999UL) / HZ msecs, which is below */
@@ -89,14 +129,16 @@ static void epoll_poll(struct ev_loop *loop, ev_t   stamp timeout) {
     eventcnt = epoll_wait(backend_fd, epoll_events, epoll_eventmax, timeout * 1e3);
     EV_ACQUIRE_CB;
 
-    if (expect_false(eventcnt < 0)) {
+    if (eventcnt < 0) [[unlikely]]
+    {
         if (errno != EINTR)
             ev_syserr("(libev) epoll_wait");
 
         return;
     }
 
-    for (i = 0; i < eventcnt; ++i) {
+    for (i = 0; i < eventcnt; ++i)
+    {
         struct epoll_event *ev = epoll_events + i;
 
         int fd = (uint32_t)ev->data.u64; /* mask out the lower 32 bits */
@@ -104,34 +146,35 @@ static void epoll_poll(struct ev_loop *loop, ev_t   stamp timeout) {
         int got = (ev->events & (EPOLLOUT | EPOLLERR | EPOLLHUP) ? EV_WRITE : 0) | (ev->events & (EPOLLIN | EPOLLERR | EPOLLHUP) ? EV_READ : 0);
 
         /*
-         * check for spurious notification.
-         * this only finds spurious notifications on egen updates
-         * other spurious notifications will be found by epoll_ctl, below
-         * we assume that fd is always in range, as we never shrink the anfds array
+         * 检查虚假通知。
+         * 此处仅检测由事件代际更新(egen)引发的虚假通知
+         * 其他类型的虚假通知将在后续的epoll_ctl调用中发现
+         * 我们假设文件描述符fd始终在有效范围内，因为anfds数组永远不会收缩
          */
-        if (expect_false((uint32_t)anfds[fd].egen != (uint32_t)(ev->data.u64 >> 32))) {
+        if (expect_false((uint32_t)anfds[fd].egen != (uint32_t)(ev->data.u64 >> 32)))
+        {
             /* recreate kernel state */
             postfork |= 2;
             continue;
         }
 
-        if (expect_false(got & ~want)) {
+        if (expect_false(got & ~want))
+        {
             anfds[fd].emask = want;
 
             /*
-             * we received an event but are not interested in it, try mod or del
-             * this often happens because we optimistically do not unregister fds
-             * when we are no longer interested in them, but also when we get spurious
-             * notifications for fds from another process. this is partially handled
-             * above with the gencounter check (== our fd is not the event fd), and
-             * partially here, when epoll_ctl returns an error (== a child has the fd
-             * but we closed it).
+             * 我们收到了一个事件但对其不感兴趣，尝试修改或删除监听
+             * 这种情况经常发生，因为我们乐观地不会在不再关注某个文件描述符时立即取消注册，
+             * 同时也可能因为收到来自其他进程的虚假文件描述符通知。
+             * 这种情况部分通过上文的生成计数器检查（即判断事件文件描述符是否属于我们）来处理，
+             * 部分在这里处理——当epoll_ctl调用返回错误时（表示子进程持有该文件描述符但我们已关闭它）。
              */
             ev->events = (want & EV_READ ? EPOLLIN : 0) | (want & EV_WRITE ? EPOLLOUT : 0);
 
             /* pre-2.6.9 kernels require a non-null pointer with EPOLL_CTL_DEL, */
             /* which is fortunately easy to do for us. */
-            if (epoll_ctl(backend_fd, want ? EPOLL_CTL_MOD : EPOLL_CTL_DEL, fd, ev)) {
+            if (epoll_ctl(backend_fd, want ? EPOLL_CTL_MOD : EPOLL_CTL_DEL, fd, ev))
+            {
                 postfork |= 2; /* an error occurred, recreate kernel state */
                 continue;
             }
@@ -141,29 +184,46 @@ static void epoll_poll(struct ev_loop *loop, ev_t   stamp timeout) {
     }
 
     /* if the receive array was full, increase its size */
-    if (expect_false(eventcnt == epoll_eventmax)) {
+    if (expect_false(eventcnt == epoll_eventmax))
+    {
         ev_free(epoll_events);
         epoll_eventmax = array_nextsize(sizeof(struct epoll_event), epoll_eventmax, epoll_eventmax + 1);
         epoll_events = (struct epoll_event *)ev_malloc(sizeof(struct epoll_event) * epoll_eventmax);
     }
 
     /* now synthesize events for all fds where epoll fails, while select works... */
-    for (i = epoll_epermcnt; i--;) {
+    for (i = epoll_epermcnt; i--;)
+    {
         int fd = epoll_eperms[i];
         unsigned char events = anfds[fd].events & (EV_READ | EV_WRITE);
 
         if (anfds[fd].emask & EV_EMASK_EPERM && events)
             fd_event(loop, fd, events);
-        else {
+        else
+        {
             epoll_eperms[i] = epoll_eperms[--epoll_epermcnt];
             anfds[fd].emask = 0;
         }
     }
 }
 
-int static inline epoll_init(struct ev_loop *loop, int flags) {
+/*
+ * 初始化epoll后端
+ * @param loop 事件循环实例
+ * @param flags 初始化标志
+ * @return 成功返回EVBACKEND_EPOLL，失败返回0
+ *
+ * 该函数负责：
+ * - 创建epoll文件描述符
+ * - 设置CLOEXEC标志
+ * - 初始化事件数组
+ * - 设置后端函数指针
+ */
+int static inline epoll_init(struct ev_loop *loop, int flags)
+{
 #ifdef EPOLL_CLOEXEC
     backend_fd = epoll_create1(EPOLL_CLOEXEC);
+
     if (backend_fd < 0 && (errno == EINVAL || errno == ENOSYS))
 #endif
         backend_fd = epoll_create(256);
@@ -183,12 +243,29 @@ int static inline epoll_init(struct ev_loop *loop, int flags) {
     return EVBACKEND_EPOLL;
 }
 
-void static inline epoll_destroy(struct ev_loop *loop) {
+/*
+ * 销毁epoll后端资源
+ * @param loop 事件循环实例
+ *
+ * 释放分配的事件数组和EPERM文件描述符数组
+ */
+void static inline epoll_destroy(struct ev_loop *loop)
+{
     ev_free(epoll_events);
     array_free(epoll_eperm, EMPTY);
 }
 
-void static inline epoll_fork(struct ev_loop *loop) {
+/*
+ * 处理fork后的epoll状态重建
+ * @param loop 事件循环实例
+ *
+ * 在fork后需要：
+ * - 关闭旧的epoll文件描述符
+ * - 创建新的epoll实例
+ * - 重新注册所有文件描述符
+ */
+void static inline epoll_fork(struct ev_loop *loop)
+{
     close(backend_fd);
 
     while ((backend_fd = epoll_create(256)) < 0)

@@ -92,7 +92,9 @@ typedef int32_t intptr_t;
 
 #if ECB_CPP
 #define ECB_EXTERN_C extern "C"
-#define ECB_EXTERN_C_BEG ECB_EXTERN_C {
+#define ECB_EXTERN_C_BEG \
+    ECB_EXTERN_C         \
+    {
 #define ECB_EXTERN_C_END }
 #else
 #define ECB_EXTERN_C extern
@@ -111,7 +113,8 @@ typedef int32_t intptr_t;
 
 #if ECB_NO_SMP
 #define ECB_MEMORY_FENCE \
-    do {                 \
+    do                   \
+    {                    \
     } while (0)
 #endif
 
@@ -120,7 +123,7 @@ typedef int32_t intptr_t;
 #include <builtins.h>
 #endif
 
-#if 1400 <= _MSC_VER // TODO.查看 _MSC_VER
+#if 1400 <= _MSC_VER
 #include <intrin.h> /* fence functions _ReadBarrier, also bit search functions _BitScanReverse */
 #endif
 
@@ -248,7 +251,8 @@ typedef int32_t intptr_t;
 
 static pthread_mutex_t ecb_mf_lock = PTHREAD_MUTEX_INITIALIZER;
 #define ECB_MEMORY_FENCE                    \
-    do {                                    \
+    do                                      \
+    {                                       \
         pthread_mutex_lock(&ecb_mf_lock);   \
         pthread_mutex_unlock(&ecb_mf_lock); \
     } while (0)
@@ -328,7 +332,8 @@ typedef struct ecb_is_constant_struct ecb_is_constant_struct;
 #if ECB_CPP11
 // older implementations might have problems with decltype(x)::type, work around it
 template <class T>
-struct ecb_decltype_t {
+struct ecb_decltype_t
+{
     typedef T type;
 };
 #define ecb_decltype(x) ecb_decltype_t<decltype(x)>::type
@@ -402,12 +407,13 @@ struct ecb_decltype_t {
 // 最低有效位的位数
 #define ecb_ctz32(x) __builtin_ctz(x)
 // 最低有效位的位数
-#define ecb_ctz64(x) __builtin_ctzll(x) 
+#define ecb_ctz64(x) __builtin_ctzll(x)
 #define ecb_popcount32(x) __builtin_popcount(x) // 汉明重量，（1的个数）
 /* no popcountll */
 #else
 constexpr static inline int ecb_ctz32(uint32_t x);
-constexpr static inline int ecb_ctz32(uint32_t x) {
+constexpr static inline int ecb_ctz32(uint32_t x)
+{
 #if 1400 <= _MSC_VER && (_M_IX86 || _M_X64 || _M_IA64 || _M_ARM)
     unsigned long r;
     _BitScanForward(&r, x);
@@ -424,11 +430,16 @@ constexpr static inline int ecb_ctz32(uint32_t x) {
     r += !!(x & 0xff00ff00) << 3;
     r += !!(x & 0xffff0000) << 4;
 #else
-    if (x & 0xaaaaaaaa) r += 1;
-    if (x & 0xcccccccc) r += 2;
-    if (x & 0xf0f0f0f0) r += 4;
-    if (x & 0xff00ff00) r += 8;
-    if (x & 0xffff0000) r += 16;
+    if (x & 0xaaaaaaaa)
+        r += 1;
+    if (x & 0xcccccccc)
+        r += 2;
+    if (x & 0xf0f0f0f0)
+        r += 4;
+    if (x & 0xff00ff00)
+        r += 8;
+    if (x & 0xffff0000)
+        r += 16;
 #endif
 
     return r;
@@ -436,7 +447,8 @@ constexpr static inline int ecb_ctz32(uint32_t x) {
 }
 
 constexpr static inline int ecb_ctz64(uint64_t x);
-constexpr static inline int ecb_ctz64(uint64_t x) {
+constexpr static inline int ecb_ctz64(uint64_t x)
+{
 #if 1400 <= _MSC_VER && (_M_X64 || _M_IA64 || _M_ARM)
     unsigned long r;
     _BitScanForward64(&r, x);
@@ -448,7 +460,8 @@ constexpr static inline int ecb_ctz64(uint64_t x) {
 }
 
 constexpr static inline int ecb_popcount32(uint32_t x);
-constexpr static inline int ecb_popcount32(uint32_t x) {
+constexpr static inline int ecb_popcount32(uint32_t x)
+{
     x -= (x >> 1) & 0x55555555;
     x = ((x >> 2) & 0x33333333) + (x & 0x33333333);
     x = ((x >> 4) + x) & 0x0f0f0f0f;
@@ -458,7 +471,8 @@ constexpr static inline int ecb_popcount32(uint32_t x) {
 }
 
 constexpr static inline int ecb_ld32(uint32_t x);
-constexpr static inline int ecb_ld32(uint32_t x) {
+constexpr static inline int ecb_ld32(uint32_t x)
+{
 #if 1400 <= _MSC_VER && (_M_IX86 || _M_X64 || _M_IA64 || _M_ARM)
     unsigned long r;
     _BitScanReverse(&r, x);
@@ -466,30 +480,38 @@ constexpr static inline int ecb_ld32(uint32_t x) {
 #else
     int r = 0;
 
-    if (x >> 16) {
+    if (x >> 16)
+    {
         x >>= 16;
         r += 16;
     }
-    if (x >> 8) {
+    if (x >> 8)
+    {
         x >>= 8;
         r += 8;
     }
-    if (x >> 4) {
+    if (x >> 4)
+    {
         x >>= 4;
         r += 4;
     }
-    if (x >> 2) {
+    if (x >> 2)
+    {
         x >>= 2;
         r += 2;
     }
-    if (x >> 1) { r += 1; }
+    if (x >> 1)
+    {
+        r += 1;
+    }
 
     return r;
 #endif
 }
 
 constexpr static inline int ecb_ld64(uint64_t x);
-constexpr static inline int ecb_ld64(uint64_t x) {
+constexpr static inline int ecb_ld64(uint64_t x)
+{
 #if 1400 <= _MSC_VER && (_M_X64 || _M_IA64 || _M_ARM)
     unsigned long r;
     _BitScanReverse64(&r, x);
@@ -497,7 +519,8 @@ constexpr static inline int ecb_ld64(uint64_t x) {
 #else
     int r = 0;
 
-    if (x >> 32) {
+    if (x >> 32)
+    {
         x >>= 32;
         r += 32;
     }
@@ -514,12 +537,14 @@ constexpr static inline ecb_bool ecb_is_pot64(uint64_t x);
 constexpr static inline ecb_bool ecb_is_pot64(uint64_t x) { return !(x & (x - 1)); }
 
 constexpr static inline uint8_t ecb_bitrev8(uint8_t x);
-constexpr static inline uint8_t ecb_bitrev8(uint8_t x) {
+constexpr static inline uint8_t ecb_bitrev8(uint8_t x)
+{
     return ((x * 0x0802U & 0x22110U) | (x * 0x8020U & 0x88440U)) * 0x10101U >> 16;
 }
 
 constexpr static inline uint16_t ecb_bitrev16(uint16_t x);
-constexpr static inline uint16_t ecb_bitrev16(uint16_t x) {
+constexpr static inline uint16_t ecb_bitrev16(uint16_t x)
+{
     x = ((x >> 1) & 0x5555) | ((x & 0x5555) << 1);
     x = ((x >> 2) & 0x3333) | ((x & 0x3333) << 2);
     x = ((x >> 4) & 0x0f0f) | ((x & 0x0f0f) << 4);
@@ -529,7 +554,8 @@ constexpr static inline uint16_t ecb_bitrev16(uint16_t x) {
 }
 
 constexpr static inline uint32_t ecb_bitrev32(uint32_t x);
-constexpr static inline uint32_t ecb_bitrev32(uint32_t x) {
+constexpr static inline uint32_t ecb_bitrev32(uint32_t x)
+{
     x = ((x >> 1) & 0x55555555) | ((x & 0x55555555) << 1);
     x = ((x >> 2) & 0x33333333) | ((x & 0x33333333) << 2);
     x = ((x >> 4) & 0x0f0f0f0f) | ((x & 0x0f0f0f0f) << 4);
@@ -542,7 +568,8 @@ constexpr static inline uint32_t ecb_bitrev32(uint32_t x) {
 /* popcount64 is only available on 64 bit cpus as gcc builtin */
 /* so for this version we are lazy */
 constexpr static inline int ecb_popcount64(uint64_t x);
-constexpr static inline int ecb_popcount64(uint64_t x) {
+constexpr static inline int ecb_popcount64(uint64_t x)
+{
     return ecb_popcount32(x) + ecb_popcount32(x >> 32);
 }
 
@@ -583,17 +610,20 @@ constexpr static inline uint64_t ecb_rotr64(uint64_t x, unsigned int count) { re
 #define ecb_bswap64(x) ((uint64_t)_byteswap_uint64((uint64_t)(x)))
 #else
 constexpr static inline uint16_t ecb_bswap16(uint16_t x);
-constexpr static inline uint16_t ecb_bswap16(uint16_t x) {
+constexpr static inline uint16_t ecb_bswap16(uint16_t x)
+{
     return ecb_rotl16(x, 8);
 }
 
 constexpr static inline uint32_t ecb_bswap32(uint32_t x);
-constexpr static inline uint32_t ecb_bswap32(uint32_t x) {
+constexpr static inline uint32_t ecb_bswap32(uint32_t x)
+{
     return (((uint32_t)ecb_bswap16(x)) << 16) | ecb_bswap16(x >> 16);
 }
 
 constexpr static inline uint64_t ecb_bswap64(uint64_t x);
-constexpr static inline uint64_t ecb_bswap64(uint64_t x) {
+constexpr static inline uint64_t ecb_bswap64(uint64_t x)
+{
     return (((uint64_t)ecb_bswap32(x)) << 32) | ecb_bswap32(x >> 32);
 }
 #endif
@@ -615,7 +645,8 @@ static inline ecb_noreturn void ecb_unreachable(void) {}
         0
 
 constexpr static inline uint32_t ecb_byteorder_helper(void);
-constexpr static inline uint32_t ecb_byteorder_helper(void) {
+constexpr static inline uint32_t ecb_byteorder_helper(void)
+{
     /* 联合体代码在gcc压力测试下仍会生成指令，/
     / 但比使用指针方式更精简，且似乎总能成功返回常量值。 /
     / 之所以采用这种复杂的预处理器逻辑，/
@@ -628,7 +659,8 @@ constexpr static inline uint32_t ecb_byteorder_helper(void) {
 #define ECB_BIG_ENDIAN 1
     return 0x11223344;
 #else
-    union {
+    union
+    {
         uint8_t c[4];
         uint32_t u;
     } u = {0x11, 0x22, 0x33, 0x44};
@@ -646,301 +678,6 @@ constexpr static inline ecb_bool ecb_little_endian(void) { return ecb_byteorder_
 #else
 // 取模运算
 #define ecb_mod(m, n) ((m) < 0 ? ((n) - 1 - ((-1 - (m)) % (n))) : ((m) % (n)))
-#endif
-
-#if ECB_CPP
-// 地板除
-template <typename T>
-static inline T ecb_div_rd(T val, T div) {
-    return val < 0 ? -((-val + div - 1) / div) : (val) / div;
-}
-// 天花板除
-template <typename T>
-static inline T ecb_div_ru(T val, T div) {
-    return val < 0 ? -((-val) / div) : (val + div - 1) / div;
-}
-#else
-#define ecb_div_rd(val, div) ((val) < 0 ? -((-(val) + (div) - 1) / (div)) : ((val)) / (div))
-#define ecb_div_ru(val, div) ((val) < 0 ? -((-(val)) / (div)) : ((val) + (div) - 1) / (div))
-#endif
-
-#if ecb_cplusplus_does_not_suck
-/* does not work for local types (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2657.htm) */
-template <typename T, int N>
-static inline int ecb_array_length(const T (&arr)[N]) {
-    return N;
-}
-#else
-#define ecb_array_length(name) (sizeof(name) / sizeof(name[0]))
-#endif
-
-constexpr static inline uint32_t ecb_binary16_to_binary32(uint32_t x);
-constexpr static inline uint32_t ecb_binary16_to_binary32(uint32_t x) {
-    unsigned int s = (x & 0x8000) << (31 - 15);
-    int e = (x >> 10) & 0x001f;
-    unsigned int m = x & 0x03ff;
-
-    if (e == 31) [[unlikely]]
-        /* infinity or NaN */
-        e = 255 - (127 - 15);
-    else if (!e) [[unlikely]] {
-        if (ecb_expect_true(!m))
-            /* zero, handled by code below by forcing e to 0 */
-            e = 0 - (127 - 15);
-        else {
-            /* subnormal, renormalise */
-            unsigned int s = 10 - ecb_ld32(m);
-
-            m = (m << s) & 0x3ff; /* mask implicit bit */
-            e -= s - 1;
-        }
-    }
-
-    /* e and m now are normalised, or zero, (or inf or nan) */
-    e += 127 - 15;
-
-    return s | (e << 23) | (m << (23 - 10));
-}
-
-constexpr static inline uint16_t ecb_binary32_to_binary16(uint32_t x);
-constexpr static inline uint16_t ecb_binary32_to_binary16(uint32_t x) {
-    unsigned int s = (x >> 16) & 0x00008000;                /* sign bit, the easy part */
-    unsigned int e = ((x >> 23) & 0x000000ff) - (127 - 15); /* the desired exponent */
-    unsigned int m = x & 0x007fffff;
-
-    x &= 0x7fffffff;
-
-    /* if it's within range of binary16 normals, use fast path */
-    if (0x38800000 <= x && x <= 0x477fefff) [[likely]] {
-        /* mantissa round-to-even */
-        m += 0x00000fff + ((m >> (23 - 10)) & 1);
-
-        /* handle overflow */
-        if (m >= 0x00800000) [[unlikely]] {
-            m >>= 1;
-            e += 1;
-        }
-
-        return s | (e << 10) | (m >> (23 - 10));
-    }
-
-    /* handle large numbers and infinity */
-    if (0x477fefff < x && x <= 0x7f800000) [[likely]]
-        return s | 0x7c00;
-
-    /* handle zero, subnormals and small numbers */
-    if (x < 0x38800000) [[likely]] {
-        /* zero */
-        if (!x) [[likely]]
-            return s;
-
-        /* handle subnormals */
-
-        /* too small, will be zero */
-        if (e < (14 - 24)) /* might not be sharp, but is good enough */
-            return s;
-
-        m |= 0x00800000; /* make implicit bit explicit */
-
-        /* very tricky - we need to round to the nearest e (+10) bit value */
-        {
-            unsigned int bits = 14 - e;
-            unsigned int half = (1 << (bits - 1)) - 1;
-            unsigned int even = (m >> bits) & 1;
-
-            /* if this overflows, we will end up with a normalised number */
-            m = (m + half + even) >> bits;
-        }
-
-        return s | m;
-    }
-
-    /* handle NaNs, preserve leftmost nan bits, but make sure we don't turn them into infinities */
-    m >>= 13;
-
-    return s | 0x7c00 | m | !m;
-}
-
-/*******************************************************************************/
-/* floating point stuff, can be disabled by defining ECB_NO_LIBM */
-
-/* basically, everything uses "ieee pure-endian" floating point numbers */
-/* the only noteworthy exception is ancient armle, which uses order 43218765 */
-#if 0 || __i386 || __i386__ || ECB_GCC_AMD64 || __powerpc__ || __ppc__ || __powerpc64__ || __ppc64__ || defined __s390__ || defined __s390x__ || defined __mips__ || defined __alpha__ || defined __hppa__ || defined __ia64__ || defined __m68k__ || defined __m88k__ || defined __sh__ || defined _M_IX86 || defined ECB_MSVC_AMD64 || defined _M_IA64 || (defined __arm__ && (defined __ARM_EABI__ || defined __EABI__ || defined __VFP_FP__ || defined _WIN32_WCE || defined __ANDROID__)) || defined __aarch64__
-#define ECB_STDFP 1
-#include <string.h> /* for memcpy */
-#else
-#define ECB_STDFP 0
-#endif
-
-#ifndef ECB_NO_LIBM
-
-#include <math.h> /* for frexp*, ldexp*, INFINITY, NAN */
-
-/* only the oldest of old doesn't have this one. solaris. */
-#ifdef INFINITY
-#define ECB_INFINITY INFINITY
-#else
-#define ECB_INFINITY HUGE_VAL
-#endif
-
-#ifdef NAN
-#define ECB_NAN NAN
-#else
-#define ECB_NAN ECB_INFINITY
-#endif
-
-#if ECB_C99 || _XOPEN_VERSION >= 600 || _POSIX_VERSION >= 200112L
-#define ecb_ldexpf(x, e) ldexpf((x), (e))
-#define ecb_frexpf(x, e) frexpf((x), (e))
-#else
-#define ecb_ldexpf(x, e) (float)ldexp((double)(x), (e))
-#define ecb_frexpf(x, e) (float)frexp((double)(x), (e))
-#endif
-
-/* convert a float to ieee single/binary32 */
-constexpr static inline uint32_t ecb_float_to_binary32(float x);
-constexpr static inline uint32_t ecb_float_to_binary32(float x) {
-    uint32_t r;
-
-#if ECB_STDFP
-    memcpy(&r, &x, 4);
-#else
-    /* slow emulation, works for anything but -0 */
-    uint32_t m;
-    int e;
-
-    if (x == 0e0f) return 0x00000000U;
-    if (x > +3.40282346638528860e+38f) return 0x7f800000U;
-    if (x < -3.40282346638528860e+38f) return 0xff800000U;
-    if (x != x) return 0x7fbfffffU;
-
-    m = ecb_frexpf(x, &e) * 0x1000000U;
-
-    r = m & 0x80000000U;
-
-    if (r)
-        m = -m;
-
-    if (e <= -126) {
-        m &= 0xffffffU;
-        m >>= (-125 - e);
-        e = -126;
-    }
-
-    r |= (e + 126) << 23;
-    r |= m & 0x7fffffU;
-#endif
-
-    return r;
-}
-
-/* converts an ieee single/binary32 to a float */
-constexpr static inline float ecb_binary32_to_float(uint32_t x);
-constexpr static inline float ecb_binary32_to_float(uint32_t x) {
-    float r;
-
-#if ECB_STDFP
-    memcpy(&r, &x, 4);
-#else
-    /* emulation, only works for normals and subnormals and +0 */
-    int neg = x >> 31;
-    int e = (x >> 23) & 0xffU;
-
-    x &= 0x7fffffU;
-
-    if (e)
-        x |= 0x800000U;
-    else
-        e = 1;
-
-    /* we distrust ldexpf a bit and do the 2**-24 scaling by an extra multiply */
-    r = ecb_ldexpf(x * (0.5f / 0x800000U), e - 126);
-
-    r = neg ? -r : r;
-#endif
-
-    return r;
-}
-
-/* convert a double to ieee double/binary64 */
-constexpr static inline uint64_t ecb_double_to_binary64(double x);
-constexpr static inline uint64_t ecb_double_to_binary64(double x) {
-    uint64_t r;
-
-#if ECB_STDFP
-    memcpy(&r, &x, 8);
-#else
-    /* slow emulation, works for anything but -0 */
-    uint64_t m;
-    int e;
-
-    if (x == 0e0) return 0x0000000000000000U;
-    if (x > +1.79769313486231470e+308) return 0x7ff0000000000000U;
-    if (x < -1.79769313486231470e+308) return 0xfff0000000000000U;
-    if (x != x) return 0X7ff7ffffffffffffU;
-
-    m = frexp(x, &e) * 0x20000000000000U;
-
-    r = m & 0x8000000000000000;
-    ;
-
-    if (r)
-        m = -m;
-
-    if (e <= -1022) {
-        m &= 0x1fffffffffffffU;
-        m >>= (-1021 - e);
-        e = -1022;
-    }
-
-    r |= ((uint64_t)(e + 1022)) << 52;
-    r |= m & 0xfffffffffffffU;
-#endif
-
-    return r;
-}
-
-/* converts an ieee double/binary64 to a double */
-constexpr static inline double ecb_binary64_to_double(uint64_t x);
-constexpr static inline double ecb_binary64_to_double(uint64_t x) {
-    double r;
-
-#if ECB_STDFP
-    memcpy(&r, &x, 8);
-#else
-    /* emulation, only works for normals and subnormals and +0 */
-    int neg = x >> 63;
-    int e = (x >> 52) & 0x7ffU;
-
-    x &= 0xfffffffffffffU;
-
-    if (e)
-        x |= 0x10000000000000U;
-    else
-        e = 1;
-
-    /* we distrust ldexp a bit and do the 2**-53 scaling by an extra multiply */
-    r = ldexp(x * (0.5 / 0x10000000000000U), e - 1022);
-
-    r = neg ? -r : r;
-#endif
-
-    return r;
-}
-
-/* convert a float to ieee half/binary16 */
-constexpr static inline uint16_t ecb_float_to_binary16(float x);
-constexpr static inline uint16_t ecb_float_to_binary16(float x) {
-    return ecb_binary32_to_binary16(ecb_float_to_binary32(x));
-}
-
-/* convert an ieee half/binary16 to float */
-constexpr static inline float ecb_binary16_to_float(uint16_t x);
-constexpr static inline float ecb_binary16_to_float(uint16_t x) {
-    return ecb_binary32_to_float(ecb_binary16_to_binary32(x));
-}
-
 #endif
 
 #endif
